@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #ffffff;
+  --color-foreground: #111111;
+
+  /* Brand Colors — Crimson */
+  --color-crimson-50: #fde8e8;
+  --color-crimson-100: #fbbcbc;
+  --color-crimson-200: #fb4545dc;
+
+  /* Brand Colors — Purple */
+  --color-purple-50: #f4f2fe;
+  --color-purple-100: #ddd7fd;
+  --color-purple-200: #ccc4fc;
+
+  /* Neutrals */
+  --color-dark: #1b1b1b;
+  --color-gray: #6b7280;
+
+  /* Fonts */
+  --font-sans: var(--font-plus-jakarta);
+  --font-mono: var(--font-plus-jakarta);
+
+  /* Animations */
+  --animate-marquee: marquee 12s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Account for fixed header on anchor targets */
+section {
+  scroll-margin-top: 4rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/* Performance: skip rendering off-screen sections until needed */
+.animate-on-scroll {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* Hide scrollbar utility (for carousel) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Scroll animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Marquee: continuous horizontal scroll */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Accessibility: respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
