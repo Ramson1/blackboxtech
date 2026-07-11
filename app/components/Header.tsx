@@ -111,7 +111,7 @@ export function Header() {
               alt="BlackBox Tech"
               width={36}
               height={36}
-              style={{ objectFit: "contain" }}
+              style={{ objectFit: "contain", width: "auto", height: "auto" }}
               priority
             />
           </Link>

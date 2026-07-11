@@ -46,6 +46,7 @@ export function Footer() {
               width={140}
               height={40}
               className="object-contain mb-4"
+              style={{ width: "auto", height: "auto" }}
             />
             <p className="text-white/60 text-sm leading-relaxed max-w-xs">
               Full-cycle product development — from ideation to market-ready

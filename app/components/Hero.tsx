@@ -45,7 +45,8 @@ export function Hero() {
             alt="BlackBox Tech"
             width={800}
             height={200}
-            className="w-full h-auto object-contain"
+            className="object-contain"
+            style={{ width: "100%", height: "auto" }}
             priority
           />
         </div>
