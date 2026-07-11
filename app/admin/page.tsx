@@ -34,6 +34,27 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: "bg-red-500/20 text-red-300",
 };
 
+// ─── Detail helpers ─────────────────────────────────────────────────────────────
+
+function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+      <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">{title}</h3>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  if (!value) return null;
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+      <span className="text-gray-500 text-xs sm:text-sm sm:w-40 shrink-0">{label}</span>
+      <span className="text-white text-sm break-words">{value}</span>
+    </div>
+  );
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
@@ -49,6 +70,9 @@ export default function AdminPage() {
   const [emailBody, setEmailBody] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [detailRow, setDetailRow] = useState<Record<string, unknown> | null>(null);
+  const [detailType, setDetailType] = useState<Tab>("student");
 
   // Get stored admin password from sessionStorage
   useEffect(() => {
@@ -129,6 +153,7 @@ export default function AdminPage() {
   const handleSendEmail = async () => {
     if (!emailTo || !emailSubject || !emailBody) return;
     setSendingEmail(true);
+    setEmailError("");
     try {
       const res = await fetch("/api/admin/send-email", {
         method: "POST",
@@ -142,6 +167,7 @@ export default function AdminPage() {
           html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">${emailBody.replace(/\n/g, "<br/>")}</div>`,
         }),
       });
+      const json = await res.json();
       if (res.ok) {
         setEmailSuccess(true);
         setTimeout(() => {
@@ -151,9 +177,12 @@ export default function AdminPage() {
           setEmailSubject("");
           setEmailBody("");
         }, 1500);
+      } else {
+        setEmailError(json.error || "Failed to send email. Check Resend configuration.");
       }
     } catch (err) {
       console.error("Send email error:", err);
+      setEmailError("Network error. Please try again.");
     }
     setSendingEmail(false);
   };
@@ -346,7 +375,7 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {currentData.map((row) => (
-                    <tr key={row.id as string} className="border-b border-white/5 hover:bg-white/5">
+                    <tr key={row.id as string} className="border-b border-white/5 hover:bg-white/5 cursor-pointer" onClick={() => { setDetailRow(row); setDetailType(activeTab); }}>
                       {activeTab === "student" && (
                         <>
                           <td className="px-4 py-3 font-medium">{row.parent_name as string}</td>
@@ -369,7 +398,7 @@ export default function AdminPage() {
                               <select
                                 value={(row.status as string) || "new"}
                                 onChange={(e) => updateStatus("student", row.id as string, e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white"
+                                className="bg-[#1a1a1a] border border-white/10 rounded px-2 py-1 text-xs text-white [&>option]:text-black [&>option]:bg-white"
                               >
                                 {STATUS_OPTIONS.student.map((s) => (
                                   <option key={s} value={s}>{s}</option>
@@ -407,7 +436,7 @@ export default function AdminPage() {
                               <select
                                 value={(row.status as string) || "new"}
                                 onChange={(e) => updateStatus("professional", row.id as string, e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white"
+                                className="bg-[#1a1a1a] border border-white/10 rounded px-2 py-1 text-xs text-white [&>option]:text-black [&>option]:bg-white"
                               >
                                 {STATUS_OPTIONS.professional.map((s) => (
                                   <option key={s} value={s}>{s}</option>
@@ -443,7 +472,7 @@ export default function AdminPage() {
                               <select
                                 value={(row.status as string) || "new"}
                                 onChange={(e) => updateStatus("build", row.id as string, e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white"
+                                className="bg-[#1a1a1a] border border-white/10 rounded px-2 py-1 text-xs text-white [&>option]:text-black [&>option]:bg-white"
                               >
                                 {STATUS_OPTIONS.build.map((s) => (
                                   <option key={s} value={s}>{s}</option>
@@ -477,7 +506,7 @@ export default function AdminPage() {
                               <select
                                 value={(row.status as string) || "new"}
                                 onChange={(e) => updateStatus("contact", row.id as string, e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white"
+                                className="bg-[#1a1a1a] border border-white/10 rounded px-2 py-1 text-xs text-white [&>option]:text-black [&>option]:bg-white"
                               >
                                 {STATUS_OPTIONS.contact.map((s) => (
                                   <option key={s} value={s}>{s}</option>
@@ -501,6 +530,131 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Detail Modal */}
+      {detailRow && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setDetailRow(null)}>
+          <div className="bg-[#1a1a1a] rounded-2xl border border-white/10 w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold">
+                {detailType === "student" && "Student Registration Details"}
+                {detailType === "professional" && "Professional Registration Details"}
+                {detailType === "build" && "Build Request Details"}
+                {detailType === "contact" && "Contact Message Details"}
+              </h2>
+              <button onClick={() => setDetailRow(null)} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div className="space-y-4">
+              {detailType === "student" && (
+                <>
+                  <DetailSection title="Parent / Guardian">
+                    <DetailRow label="Name" value={detailRow.parent_name as string} />
+                    <DetailRow label="Email" value={detailRow.parent_email as string} />
+                    <DetailRow label="Phone" value={detailRow.parent_phone as string} />
+                  </DetailSection>
+                  <DetailSection title="Child Details">
+                    <DetailRow label="Name" value={detailRow.child_name as string} />
+                    <DetailRow label="Age" value={detailRow.child_age as string} />
+                    <DetailRow label="Gender" value={detailRow.child_gender as string} />
+                    <DetailRow label="Experience Level" value={detailRow.child_level as string} />
+                  </DetailSection>
+                  <DetailSection title="Training Preferences">
+                    <DetailRow label="Programs" value={Array.isArray(detailRow.programs) ? (detailRow.programs as string[]).join(", ") : (detailRow.programs as string)} />
+                    <DetailRow label="Preferred Schedule" value={detailRow.schedule as string} />
+                    <DetailRow label="Preferred Time" value={detailRow.preferred_time as string} />
+                    <DetailRow label="Training Mode" value={(detailRow.training_mode as string) === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"} />
+                    <DetailRow label="Payment Plan" value={detailRow.payment_plan as string} />
+                    <DetailRow label="Preferred Start Date" value={detailRow.start_date as string} />
+                    {detailRow.notes ? <DetailRow label="Notes" value={detailRow.notes as string} /> : null}
+                  </DetailSection>
+                </>
+              )}
+              {detailType === "professional" && (
+                <>
+                  <DetailSection title="Personal Details">
+                    <DetailRow label="Full Name" value={detailRow.full_name as string} />
+                    <DetailRow label="Email" value={detailRow.email as string} />
+                    <DetailRow label="Phone" value={detailRow.phone as string} />
+                    <DetailRow label="Gender" value={detailRow.gender as string} />
+                    <DetailRow label="Date of Birth" value={detailRow.dob as string} />
+                  </DetailSection>
+                  <DetailSection title="Professional Information">
+                    <DetailRow label="Organization" value={(detailRow.organization as string) || "N/A"} />
+                    <DetailRow label="Job Title" value={(detailRow.job_title as string) || "N/A"} />
+                  </DetailSection>
+                  <DetailSection title="Training Preferences">
+                    <DetailRow label="Programs" value={Array.isArray(detailRow.programs) ? (detailRow.programs as string[]).join(", ") : (detailRow.programs as string)} />
+                    <DetailRow label="Preferred Schedule" value={detailRow.schedule as string} />
+                    <DetailRow label="Preferred Time" value={detailRow.preferred_time as string} />
+                    <DetailRow label="Experience Level" value={detailRow.experience_level as string} />
+                    <DetailRow label="Training Mode" value={(detailRow.training_mode as string) === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"} />
+                    <DetailRow label="Payment Preference" value={detailRow.payment_preference as string} />
+                    {detailRow.additional_info ? <DetailRow label="Additional Info" value={detailRow.additional_info as string} /> : null}
+                  </DetailSection>
+                </>
+              )}
+              {detailType === "build" && (
+                <>
+                  <DetailSection title="Business Details">
+                    <DetailRow label="Company Name" value={detailRow.company_name as string} />
+                    <DetailRow label="Contact Name" value={detailRow.full_name as string} />
+                    <DetailRow label="Email" value={detailRow.email as string} />
+                    <DetailRow label="Phone" value={detailRow.phone as string} />
+                  </DetailSection>
+                  <DetailSection title="Project Details">
+                    <DetailRow label="Project Type" value={detailRow.project_type as string} />
+                    <DetailRow label="Budget Range" value={detailRow.budget as string} />
+                    <DetailRow label="Expected Timeline" value={detailRow.timeline as string} />
+                    <DetailRow label="Description" value={detailRow.description as string} />
+                    {detailRow.additional_requirements ? <DetailRow label="Additional Requirements" value={detailRow.additional_requirements as string} /> : null}
+                    {Array.isArray(detailRow.file_urls) && (detailRow.file_urls as string[]).length > 0 ? (
+                      <div className="mt-2">
+                        <p className="text-sm font-semibold text-white/60 mb-2">Attached Files</p>
+                        <div className="space-y-1.5">
+                          {(detailRow.file_urls as string[]).map((url: string, idx: number) => {
+                            const names = detailRow.files ? (detailRow.files as string).split(", ") : [];
+                            const name = names[idx] || `File ${idx + 1}`;
+                            return (
+                              <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-sm text-crimson-200 hover:text-white">
+                                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                <span className="truncate">{name}</span>
+                                <span className="ml-auto text-xs text-white/30">Open</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (detailRow.files ? <DetailRow label="Attached Files" value={detailRow.files as string} /> : null)}
+                  </DetailSection>
+                </>
+              )}
+              {detailType === "contact" && (
+                <DetailSection title="Message">
+                  <DetailRow label="Name" value={detailRow.name as string} />
+                  <DetailRow label="Email" value={detailRow.email as string} />
+                  <DetailRow label="Message" value={detailRow.message as string} />
+                </DetailSection>
+              )}
+              <DetailSection title="Meta">
+                <DetailRow label="Status" value={(detailRow.status as string) || "new"} />
+                <DetailRow label="Submitted" value={new Date(detailRow.created_at as string).toLocaleString()} />
+              </DetailSection>
+            </div>
+            <div className="mt-6 flex gap-3">
+              <button onClick={() => setDetailRow(null)} className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg transition-colors">Close</button>
+              <button
+                onClick={() => {
+                  const email = (detailRow.parent_email || detailRow.email || (detailRow as Record<string, unknown>).email) as string;
+                  setEmailTo(email); setEmailSubject(""); setEmailBody(""); setShowEmailModal(true); setDetailRow(null);
+                }}
+                className="flex-1 bg-[#fb4545dc] hover:bg-[#fb4545dc]/80 text-white font-semibold py-3 rounded-lg transition-colors"
+              >
+                Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Email Modal */}
       {showEmailModal && (
@@ -539,6 +693,7 @@ export default function AdminPage() {
                   rows={6}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#fb4545dc] mb-4 resize-none"
                 />
+                {emailError && <p className="text-red-400 text-sm mb-3">{emailError}</p>}
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowEmailModal(false)}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -39,22 +40,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-invoke-path") || "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html
       lang="en"
       className={`${plusJakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <CursorDots />
-        <Header />
+        {!isAdmin && <CursorDots />}
+        {!isAdmin && <Header />}
         <main className="flex-1">{children}</main>
-        <Footer />
-        <ChatWidget />
+        {!isAdmin && <Footer />}
+        {!isAdmin && <ChatWidget />}
       </body>
     </html>
   );

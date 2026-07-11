@@ -109,8 +109,8 @@ export function Header() {
             <Image
               src="/logos/logoBlackPlain.png"
               alt="BlackBox Tech"
-              width={36}
-              height={36}
+              width={32}
+              height={32}
               style={{ objectFit: "contain", width: "auto", height: "auto" }}
               priority
             />

@@ -101,6 +101,22 @@ export const scheduleOptions = [
   { id: "weekend", label: "Weekend Classes", time: "Sat - Sun, 9:00 AM - 4:00 PM" },
 ] as const;
 
+export const weekDays = [
+  { id: "monday", label: "Mon" },
+  { id: "tuesday", label: "Tue" },
+  { id: "wednesday", label: "Wed" },
+  { id: "thursday", label: "Thu" },
+  { id: "friday", label: "Fri" },
+  { id: "saturday", label: "Sat" },
+  { id: "sunday", label: "Sun" },
+] as const;
+
+export const timeSlots = [
+  { id: "morning", label: "Morning", time: "8:00 AM - 12:00 PM" },
+  { id: "afternoon", label: "Afternoon", time: "12:00 PM - 4:00 PM" },
+  { id: "evening", label: "Evening", time: "5:00 PM - 9:00 PM" },
+] as const;
+
 // ─── Experience Levels ─────────────────────────────────────────────────────────
 export const experienceLevels = [
   { id: "beginner", label: "Beginner", description: "No prior experience required" },

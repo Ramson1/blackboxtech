@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
         child_level: body.childLevel,
         programs: Array.isArray(body.programs) ? body.programs : [],
         schedule: body.schedule,
+        preferred_time: body.preferredTime,
         start_date: body.startDate,
         payment_plan: body.paymentPlan,
         training_mode: body.trainingMode,
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
         job_title: body.jobTitle,
         programs: Array.isArray(body.programs) ? body.programs : [],
         schedule: body.schedule,
+        preferred_time: body.preferredTime,
         experience_level: body.experienceLevel,
         training_mode: body.trainingMode,
         payment_preference: body.paymentPreference,
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest) {
         timeline: body.timeline,
         description: body.description,
         files: body.files,
+        file_urls: Array.isArray(body.file_urls) ? body.file_urls : [],
         additional_requirements: body.additionalRequirements,
       });
       if (error) throw error;

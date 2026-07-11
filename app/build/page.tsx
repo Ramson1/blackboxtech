@@ -27,21 +27,53 @@ export default function BuildPage() {
 
   const removeFile = (index: number) => setFiles((prev) => prev.filter((_, i) => i !== index));
 
+  const [uploadProgress, setUploadProgress] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
     try {
+      let fileUrls: string[] = [];
+      let fileNames: string[] = [];
+
+      // Upload files to Supabase Storage first
+      if (files.length > 0) {
+        setUploadProgress("Uploading files...");
+        const formData = new FormData();
+        files.forEach((f) => formData.append("files", f));
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          alert(err.error || "File upload failed");
+          setSending(false);
+          setUploadProgress("");
+          return;
+        }
+
+        const uploadData = await uploadRes.json();
+        fileUrls = uploadData.urls || [];
+        fileNames = uploadData.names || [];
+      }
+
+      setUploadProgress("Submitting request...");
       await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "build", ...form,
-          files: files.map((f) => f.name).join(", "),
+          type: "build",
+          ...form,
+          files: fileNames.join(", "),
+          file_urls: fileUrls,
         }),
       });
       setSubmitted(true);
     } catch { /* ignore */ }
-    finally { setSending(false); }
+    finally { setSending(false); setUploadProgress(""); }
   };
 
   if (submitted) {
@@ -212,7 +244,7 @@ export default function BuildPage() {
             </div>
 
             <button type="submit" disabled={sending} className="w-full py-4 rounded-xl font-bold text-lg text-white transition-colors disabled:opacity-60 cursor-pointer" style={{ background: "linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%)" }}>
-              {sending ? "Submitting..." : "Submit Project Request"}
+              {sending ? (uploadProgress || "Submitting...") : "Submit Project Request"}
             </button>
             <p className="text-xs text-white/30 text-center">We&apos;ll review your request and respond within 48 hours.</p>
           </form>

@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { studentPrograms, paymentPlans, scheduleOptions, experienceLevels } from "@/lib/content";
+import { studentPrograms, paymentPlans, scheduleOptions, experienceLevels, weekDays, timeSlots } from "@/lib/content";
 
 export default function StudentRegistrationPage() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [form, setForm] = useState({
     parentName: "", parentEmail: "", parentPhone: "",
     childName: "", childAge: "", childGender: "", childLevel: "beginner",
-    schedule: "", startDate: "", paymentPlan: "", trainingMode: "virtual", notes: "",
+    schedule: "", preferredTime: "", startDate: "", paymentPlan: "", trainingMode: "virtual", notes: "",
   });
 
   const toggleProgram = (name: string) => {
@@ -20,16 +21,25 @@ export default function StudentRegistrationPage() {
     );
   };
 
+  const toggleDay = (day: string) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
+    const dayLabels = selectedDays.map((d) => weekDays.find((w) => w.id === d)?.label || d);
+    const timeLabel = timeSlots.find((t) => t.id === form.preferredTime)?.label || "";
+    const scheduleStr = [dayLabels.join(", "), timeLabel].filter(Boolean).join(" - ");
     try {
       await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "student", ...form, programs: selectedPrograms }),
+        body: JSON.stringify({ type: "student", ...form, programs: selectedPrograms, schedule: scheduleStr || form.schedule }),
       });
       setSubmitted(true);
     } catch { /* ignore */ }
@@ -226,11 +236,30 @@ export default function StudentRegistrationPage() {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className={labelStyle}>Preferred Days</label>
+                <div className="flex flex-wrap gap-2">
+                  {weekDays.map((day) => (
+                    <button
+                      key={day.id}
+                      type="button"
+                      onClick={() => toggleDay(day.id)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
+                        selectedDays.includes(day.id)
+                          ? "bg-crimson-200 text-white border-crimson-200"
+                          : "bg-white border-gray-300 text-dark hover:border-crimson-200"
+                      }`}
+                    >
+                      {day.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div><label className={labelStyle}>Preferred Schedule</label>
-                  <select className={inputStyle} value={form.schedule} onChange={(e) => update("schedule", e.target.value)}>
+                <div><label className={labelStyle}>Preferred Time</label>
+                  <select className={inputStyle} value={form.preferredTime} onChange={(e) => update("preferredTime", e.target.value)}>
                     <option value="">Select</option>
-                    {scheduleOptions.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                    {timeSlots.map((t) => <option key={t.id} value={t.id}>{t.label} ({t.time})</option>)}
                   </select>
                 </div>
                 <div><label className={labelStyle}>Preferred Start Date</label><input type="date" className={inputStyle} value={form.startDate} onChange={(e) => update("startDate", e.target.value)} /></div>
