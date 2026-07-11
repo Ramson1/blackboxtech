@@ -45,12 +45,33 @@ function DetailSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
+function CopyIcon({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <button onClick={handleCopy} className="ml-1.5 text-gray-500 hover:text-white transition-colors shrink-0" title="Copy">
+      {copied ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
+      )}
+    </button>
+  );
+}
+
 function DetailRow({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
     <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
       <span className="text-gray-500 text-xs sm:text-sm sm:w-40 shrink-0">{label}</span>
       <span className="text-white text-sm break-words">{value}</span>
+      <CopyIcon text={value} />
     </div>
   );
 }
@@ -60,6 +81,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("student");
   const [data, setData] = useState<DashboardData>({ student: [], professional: [], build: [], contact: [] });
@@ -73,6 +95,8 @@ export default function AdminPage() {
   const [emailError, setEmailError] = useState("");
   const [detailRow, setDetailRow] = useState<Record<string, unknown> | null>(null);
   const [detailType, setDetailType] = useState<Tab>("student");
+  const [statusFilter, setStatusFilter] = useState<string>("new");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Get stored admin password from sessionStorage
   useEffect(() => {
@@ -198,6 +222,8 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
+      <>
+      <style>{`html, body { background: #111 !important; margin: 0; padding: 0; }`}</style>
       <div className="min-h-screen bg-[#111] flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
@@ -205,14 +231,27 @@ export default function AdminPage() {
             <p className="text-gray-400 text-sm">Enter your admin password to continue</p>
           </div>
           <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/10">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              placeholder="Admin password"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#fb4545dc] mb-3"
-            />
+            <div className="relative mb-3">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                placeholder="Admin password"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pr-11 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#fb4545dc]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                )}
+              </button>
+            </div>
             {passwordError && <p className="text-red-400 text-sm mb-3">{passwordError}</p>}
             <button
               onClick={handleLogin}
@@ -224,6 +263,7 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
@@ -251,9 +291,25 @@ export default function AdminPage() {
 
   const currentData = data[activeTab];
 
+  // Filter by status and search query
+  const filteredData = currentData.filter((row) => {
+    // Status filter
+    if (statusFilter !== "all" && (row.status as string || "new") !== statusFilter) return false;
+    // Search filter
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return Object.values(row).some((val) => {
+      if (val === null || val === undefined) return false;
+      if (Array.isArray(val)) return val.some((v) => String(v).toLowerCase().includes(q));
+      return String(val).toLowerCase().includes(q);
+    });
+  });
+
   // ─── Dashboard ─────────────────────────────────────────────────────────────────
 
   return (
+    <>
+    <style>{`html, body { background: #111 !important; margin: 0; padding: 0; }`}</style>
     <div className="min-h-screen bg-[#111] text-white">
       {/* Header */}
       <div className="bg-[#1a1a1a] border-b border-white/10 px-6 py-4 flex items-center justify-between">
@@ -292,11 +348,11 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 overflow-x-auto">
+        <div className="flex gap-2 mb-4 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => { setActiveTab(tab.key); setStatusFilter("new"); setSearchQuery(""); }}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 activeTab === tab.key
                   ? "bg-[#fb4545dc] text-white"
@@ -314,10 +370,72 @@ export default function AdminPage() {
           </button>
         </div>
 
+        {/* Filter Buttons + Search */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="flex gap-1.5 overflow-x-auto flex-1">
+            <button
+              onClick={() => setStatusFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                statusFilter === "all"
+                  ? "bg-white/20 text-white"
+                  : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              All ({currentData.length})
+            </button>
+            {STATUS_OPTIONS[activeTab].map((status) => {
+              const count = currentData.filter((r) => (r.status as string || "new") === status).length;
+              return (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                    statusFilter === status
+                      ? STATUS_COLORS[status] || "bg-white/20 text-white"
+                      : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  {status} ({count})
+                </button>
+              );
+            })}
+          </div>
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search anything..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 w-full sm:w-56"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Results count */}
+        {(searchQuery || statusFilter !== "all") && (
+          <p className="text-xs text-gray-500 mb-3">
+            Showing {filteredData.length} of {currentData.length} entries
+            {searchQuery && <span> for &quot;{searchQuery}&quot;</span>}
+          </p>
+        )}
+
         {/* Data Table */}
-        {currentData.length === 0 ? (
+        {filteredData.length === 0 ? (
           <div className="bg-[#1a1a1a] rounded-xl p-12 text-center border border-white/10">
-            <p className="text-gray-500">No entries yet</p>
+            <p className="text-gray-500">{currentData.length === 0 ? "No entries yet" : "No matching entries"}</p>
           </div>
         ) : (
           <div className="bg-[#1a1a1a] rounded-xl border border-white/10 overflow-hidden">
@@ -374,7 +492,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentData.map((row) => (
+                  {filteredData.map((row) => (
                     <tr key={row.id as string} className="border-b border-white/5 hover:bg-white/5 cursor-pointer" onClick={() => { setDetailRow(row); setDetailType(activeTab); }}>
                       {activeTab === "student" && (
                         <>
@@ -393,7 +511,7 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-gray-400 text-xs">
                             {new Date(row.created_at as string).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               <select
                                 value={(row.status as string) || "new"}
@@ -431,7 +549,7 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-gray-400 text-xs">
                             {new Date(row.created_at as string).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               <select
                                 value={(row.status as string) || "new"}
@@ -467,7 +585,7 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-gray-400 text-xs">
                             {new Date(row.created_at as string).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               <select
                                 value={(row.status as string) || "new"}
@@ -501,7 +619,7 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-gray-400 text-xs">
                             {new Date(row.created_at as string).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-2">
                               <select
                                 value={(row.status as string) || "new"}
@@ -715,5 +833,6 @@ export default function AdminPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

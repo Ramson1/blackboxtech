@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/resend";
+import { emailHeader, emailFooter, wrapEmail, GRADIENTS } from "@/lib/email-templates";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "blackboxinfo01@gmail.com";
 
@@ -117,146 +118,145 @@ export async function POST(request: NextRequest) {
 // ─── Admin notification email builders ─────────────────────────────────────────
 
 function buildStudentEmail(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Student Training Registration</h2>
-      </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <h3 style="color: #374151; margin-top: 0;">Parent Details</h3>
-        <p><strong>Name:</strong> ${data.parentName}</p>
-        <p><strong>Email:</strong> ${data.parentEmail}</p>
-        <p><strong>Phone:</strong> ${data.parentPhone}</p>
-        <h3 style="color: #374151;">Child Details</h3>
-        <p><strong>Name:</strong> ${data.childName}</p>
-        <p><strong>Age:</strong> ${data.childAge}</p>
-        <p><strong>Gender:</strong> ${data.childGender}</p>
-        <p><strong>Level:</strong> ${data.childLevel}</p>
-        <h3 style="color: #374151;">Training Preferences</h3>
-        <p><strong>Programs:</strong> ${Array.isArray(data.programs) ? data.programs.join(", ") : data.programs}</p>
-        <p><strong>Schedule:</strong> ${data.schedule}</p>
-        <p><strong>Training Mode:</strong> ${data.trainingMode === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"}</p>
-        <p><strong>Payment Plan:</strong> ${data.paymentPlan}</p>
-        <p><strong>Preferred Start:</strong> ${data.startDate}</p>
-        ${data.notes ? `<p><strong>Notes:</strong> ${data.notes}</p>` : ""}
-      </div>
-    </div>`;
+  return wrapEmail(`
+    ${emailHeader("Student Training Registration", GRADIENTS.student)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Parent / Guardian</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Name:</strong> ${data.parentName}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Email:</strong> ${data.parentEmail}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Phone:</strong> ${data.parentPhone}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1.25rem 0;" />
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Child Details</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Name:</strong> ${data.childName}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Age:</strong> ${data.childAge}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Gender:</strong> ${data.childGender}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Level:</strong> ${data.childLevel}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1.25rem 0;" />
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Training Preferences</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Programs:</strong> ${Array.isArray(data.programs) ? data.programs.join(", ") : data.programs}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Schedule:</strong> ${data.schedule}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Mode:</strong> ${data.trainingMode === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Payment:</strong> ${data.paymentPlan}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Start Date:</strong> ${data.startDate}</p>
+      ${data.notes ? `<p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Notes:</strong> ${data.notes}</p>` : ""}
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 function buildProfessionalEmail(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #ddd7fd 0%, #fb4545dc 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Professional Training Registration</h2>
-      </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <h3 style="color: #374151; margin-top: 0;">Personal Details</h3>
-        <p><strong>Name:</strong> ${data.fullName}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-        <p><strong>Gender:</strong> ${data.gender}</p>
-        <p><strong>Date of Birth:</strong> ${data.dob}</p>
-        <h3 style="color: #374151;">Professional Information</h3>
-        <p><strong>Organization:</strong> ${data.organization || "N/A"}</p>
-        <p><strong>Job Title:</strong> ${data.jobTitle || "N/A"}</p>
-        <h3 style="color: #374151;">Training Preferences</h3>
-        <p><strong>Programs:</strong> ${Array.isArray(data.programs) ? data.programs.join(", ") : data.programs}</p>
-        <p><strong>Schedule:</strong> ${data.schedule}</p>
-        <p><strong>Experience Level:</strong> ${data.experienceLevel}</p>
-        <p><strong>Training Mode:</strong> ${data.trainingMode === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"}</p>
-        <p><strong>Payment Preference:</strong> ${data.paymentPreference}</p>
-        ${data.additionalInfo ? `<p><strong>Additional Info:</strong> ${data.additionalInfo}</p>` : ""}
-      </div>
-    </div>`;
+  return wrapEmail(`
+    ${emailHeader("Professional Training Registration", GRADIENTS.professional)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Personal Details</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Name:</strong> ${data.fullName}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Email:</strong> ${data.email}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Phone:</strong> ${data.phone}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Gender:</strong> ${data.gender}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>DOB:</strong> ${data.dob}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1.25rem 0;" />
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Professional Information</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Organization:</strong> ${data.organization || "N/A"}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Job Title:</strong> ${data.jobTitle || "N/A"}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1.25rem 0;" />
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Training Preferences</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Programs:</strong> ${Array.isArray(data.programs) ? data.programs.join(", ") : data.programs}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Schedule:</strong> ${data.schedule}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Level:</strong> ${data.experienceLevel}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Mode:</strong> ${data.trainingMode === "virtual" ? "Virtual (Online)" : "Physical (In-Person)"}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Payment:</strong> ${data.paymentPreference}</p>
+      ${data.additionalInfo ? `<p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Additional:</strong> ${data.additionalInfo}</p>` : ""}
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 function buildSoftwareEmail(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #1b1b1b 0%, #374151 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Software Build Request</h2>
-      </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <h3 style="color: #374151; margin-top: 0;">Business Details</h3>
-        <p><strong>Company:</strong> ${data.companyName}</p>
-        <p><strong>Contact Name:</strong> ${data.fullName}</p>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Phone:</strong> ${data.phone}</p>
-        <h3 style="color: #374151;">Project Details</h3>
-        <p><strong>Project Type:</strong> ${data.projectType}</p>
-        <p><strong>Budget Range:</strong> ${data.budget}</p>
-        <p><strong>Expected Timeline:</strong> ${data.timeline}</p>
-        <p><strong>Description:</strong> ${data.description}</p>
-        ${data.files ? `<p><strong>Attached Files:</strong> ${data.files}</p>` : ""}
-        ${data.additionalRequirements ? `<p><strong>Additional Requirements:</strong> ${data.additionalRequirements}</p>` : ""}
-      </div>
-    </div>`;
+  return wrapEmail(`
+    ${emailHeader("Software Build Request", GRADIENTS.build)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Business Details</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Company:</strong> ${data.companyName}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Contact:</strong> ${data.fullName}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Email:</strong> ${data.email}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Phone:</strong> ${data.phone}</p>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1.25rem 0;" />
+      <h3 style="color: #374151; margin: 0 0 0.75rem; font-size: 0.95rem;">Project Details</h3>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Type:</strong> ${data.projectType}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Budget:</strong> ${data.budget}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Timeline:</strong> ${data.timeline}</p>
+      <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Description:</strong> ${data.description}</p>
+      ${data.files ? `<p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Files:</strong> ${data.files}</p>` : ""}
+      ${data.additionalRequirements ? `<p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151;"><strong>Requirements:</strong> ${data.additionalRequirements}</p>` : ""}
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 // ─── Client confirmation email builders ────────────────────────────────────────
 
 function buildStudentConfirmation(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Registration Received!</h2>
+  return wrapEmail(`
+    ${emailHeader("Registration Received!", GRADIENTS.student)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <p style="font-size: 1rem; color: #374151; margin: 0 0 1rem;">Hi ${data.parentName},</p>
+      <p style="font-size: 0.95rem; color: #374151; line-height: 1.7; margin: 0 0 1.25rem;">Thank you for registering <strong>${data.childName}</strong> for our student training programs at BlackBox Tech. We've received your registration and our team will contact you within 24 hours to confirm the schedule and provide payment details.</p>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <p style="font-size: 0.9rem; color: #374151; font-weight: 700; margin: 0 0 0.75rem;">What happens next:</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Our team will review your registration</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; We'll contact you to confirm the schedule</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Payment details will be provided</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Your child will start learning!</td></tr>
+        </table>
       </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <p>Hi ${data.parentName},</p>
-        <p>Thank you for registering <strong>${data.childName}</strong> for our student training programs at BlackBox Tech. We've received your registration and our team will contact you within 24 hours to confirm the schedule and provide payment details.</p>
-        <p><strong>What happens next:</strong></p>
-        <ol>
-          <li>Our team will review your registration</li>
-          <li>We'll contact you to confirm the schedule</li>
-          <li>Payment details will be provided</li>
-          <li>Your child will start learning!</li>
-        </ol>
-        <p>If you have any questions, feel free to reply to this email.</p>
-        <p>Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
-      </div>
-    </div>`;
+      <p style="font-size: 0.9rem; color: #374151; margin: 0 0 1rem;">If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@blackboxtech.online" style="color: #fb4545dc; text-decoration: none;">info@blackboxtech.online</a></p>
+      <p style="font-size: 0.9rem; color: #374151; margin: 0;">Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 function buildProfessionalConfirmation(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #ddd7fd 0%, #fb4545dc 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Registration Received!</h2>
+  return wrapEmail(`
+    ${emailHeader("Registration Received!", GRADIENTS.professional)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <p style="font-size: 1rem; color: #374151; margin: 0 0 1rem;">Hi ${data.fullName},</p>
+      <p style="font-size: 0.95rem; color: #374151; line-height: 1.7; margin: 0 0 1.25rem;">Thank you for registering for our professional training programs at BlackBox Tech. We've received your registration and our team will contact you within 24 hours.</p>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <p style="font-size: 0.9rem; color: #374151; font-weight: 700; margin: 0 0 0.75rem;">What happens next:</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; We'll review your registration and preferences</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; We'll contact you to discuss the best program fit</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Payment and schedule details will be provided</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; You'll begin your training journey!</td></tr>
+        </table>
       </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <p>Hi ${data.fullName},</p>
-        <p>Thank you for registering for our professional training programs at BlackBox Tech. We've received your registration and our team will contact you within 24 hours.</p>
-        <p><strong>What happens next:</strong></p>
-        <ol>
-          <li>Our team will review your registration and preferences</li>
-          <li>We'll contact you to discuss the best program fit</li>
-          <li>Payment and schedule details will be provided</li>
-          <li>You'll begin your training journey!</li>
-        </ol>
-        <p>If you have any questions, feel free to reply to this email.</p>
-        <p>Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
-      </div>
-    </div>`;
+      <p style="font-size: 0.9rem; color: #374151; margin: 0 0 1rem;">If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@blackboxtech.online" style="color: #fb4545dc; text-decoration: none;">info@blackboxtech.online</a></p>
+      <p style="font-size: 0.9rem; color: #374151; margin: 0;">Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 function buildSoftwareConfirmation(data: Record<string, unknown>) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #1b1b1b 0%, #374151 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Project Request Received!</h2>
+  return wrapEmail(`
+    ${emailHeader("Project Request Received!", GRADIENTS.build)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <p style="font-size: 1rem; color: #374151; margin: 0 0 1rem;">Hi ${data.fullName},</p>
+      <p style="font-size: 0.95rem; color: #374151; line-height: 1.7; margin: 0 0 1.25rem;">Thank you for reaching out to BlackBox Tech about your project${data.companyName ? ` at <strong>${data.companyName}</strong>` : ""}. We've received your project request and our team will review it shortly.</p>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <p style="font-size: 0.9rem; color: #374151; font-weight: 700; margin: 0 0 0.75rem;">What happens next:</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Our team will review your project requirements</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; We'll reach out within 48 hours to discuss your project</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; We'll provide a detailed proposal and timeline</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Once approved, we'll begin development!</td></tr>
+        </table>
       </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <p>Hi ${data.fullName},</p>
-        <p>Thank you for reaching out to BlackBox Tech about your project${data.companyName ? ` at <strong>${data.companyName}</strong>` : ""}. We've received your project request and our team will review it shortly.</p>
-        <p><strong>What happens next:</strong></p>
-        <ol>
-          <li>Our team will review your project requirements</li>
-          <li>We'll reach out within 48 hours to discuss your project</li>
-          <li>We'll provide a detailed proposal and timeline</li>
-          <li>Once approved, we'll begin development!</li>
-        </ol>
-        <p>If you have any questions or need to update your request, feel free to reply to this email.</p>
-        <p>Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
-      </div>
-    </div>`;
+      <p style="font-size: 0.9rem; color: #374151; margin: 0 0 1rem;">If you have any questions or need to update your request, feel free to reply to this email or contact us at <a href="mailto:info@blackboxtech.online" style="color: #fb4545dc; text-decoration: none;">info@blackboxtech.online</a></p>
+      <p style="font-size: 0.9rem; color: #374151; margin: 0;">Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
+    </div>
+    ${emailFooter()}
+  `);
 }

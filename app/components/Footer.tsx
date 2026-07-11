@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { footerLinks, contactInfo } from "@/lib/content";
 
 function LinkedInIcon() {
@@ -62,12 +63,12 @@ export function Footer() {
             <ul className="space-y-2.5">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-white/60 hover:text-white transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -81,12 +82,12 @@ export function Footer() {
             <ul className="space-y-2.5">
               {footerLinks.services.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-white/60 hover:text-white transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -98,9 +99,8 @@ export function Footer() {
               Contact
             </h4>
             <ul className="space-y-2.5 text-sm text-white/60">
-              <li>{contactInfo.email}</li>
-              <li>{contactInfo.phone}</li>
-              <li>{contactInfo.address}</li>
+              <li><a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">{contactInfo.email}</a></li>
+              <li><a href={`tel:${contactInfo.phone.replace(/\s/g, "")}`} className="hover:text-white transition-colors">{contactInfo.phone}</a></li>
             </ul>
             {/* Social icons */}
             <div className="flex gap-3 mt-5">
@@ -147,17 +147,17 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/40">
-            &copy; 2026 BlackBox Tech. All rights reserved.
+            &copy; {new Date().getFullYear()} BlackBox Tech. All rights reserved.
           </p>
           <div className="flex gap-6">
             {footerLinks.legal.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="text-xs text-white/40 hover:text-white/70 transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

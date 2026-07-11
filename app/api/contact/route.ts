@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/resend";
+import { emailHeader, emailFooter, wrapEmail, GRADIENTS } from "@/lib/email-templates";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "blackboxinfo01@gmail.com";
 
@@ -42,36 +43,42 @@ export async function POST(request: NextRequest) {
 }
 
 function buildContactAdminEmail(name: string, email: string, message: string) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0; font-size: 1.25rem;">New Contact Form Submission</h2>
+  return wrapEmail(`
+    ${emailHeader("New Contact Form Submission", GRADIENTS.contact)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.25rem;">From</p>
+        <p style="color: #111; font-size: 1rem; font-weight: 600; margin: 0;">${name}</p>
+        <p style="color: #6b7280; font-size: 0.875rem; margin: 0.25rem 0 0;">${email}</p>
       </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <div style="margin-bottom: 1.5rem;">
-          <p style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.25rem;">From</p>
-          <p style="color: #111; font-size: 1rem; font-weight: 600; margin: 0;">${name}</p>
-          <p style="color: #6b7280; font-size: 0.875rem; margin: 0.25rem 0 0;">${email}</p>
-        </div>
-        <div>
-          <p style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.25rem;">Message</p>
+      <div>
+        <p style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.5rem;">Message</p>
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem;">
           <p style="color: #111; font-size: 0.95rem; line-height: 1.6; margin: 0;">${message.replace(/\n/g, "<br/>")}</p>
         </div>
       </div>
-    </div>`;
+    </div>
+    ${emailFooter()}
+  `);
 }
 
 function buildContactConfirmation(name: string) {
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-      <div style="background: linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%); padding: 1.5rem; border-radius: 1rem 1rem 0 0;">
-        <h2 style="color: #fff; margin: 0;">Message Received!</h2>
+  return wrapEmail(`
+    ${emailHeader("Message Received!", GRADIENTS.contact)}
+    <div style="background: #f9fafb; padding: 1.75rem 2rem;">
+      <p style="font-size: 1rem; color: #374151; margin: 0 0 1rem;">Hi ${name},</p>
+      <p style="font-size: 0.95rem; color: #374151; line-height: 1.7; margin: 0 0 1.25rem;">Thank you for reaching out to BlackBox Tech. We've received your message and our team will get back to you as soon as possible — usually within 24 hours.</p>
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <p style="font-size: 0.9rem; color: #374151; font-weight: 700; margin: 0 0 0.75rem;">In the meantime:</p>
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Explore our <a href="https://blackboxtech-nine.vercel.app" style="color: #fb4545dc; text-decoration: none;">website</a> to learn about our services</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Check out our training programs for students &amp; professionals</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Browse our product catalog</td></tr>
+        </table>
       </div>
-      <div style="background: #f9fafb; padding: 1.5rem; border-radius: 0 0 1rem 1rem; border: 1px solid #e5e7eb;">
-        <p>Hi ${name},</p>
-        <p>Thank you for reaching out to BlackBox Tech. We've received your message and our team will get back to you as soon as possible.</p>
-        <p>In the meantime, feel free to explore our website to learn more about our services, products, and training programs.</p>
-        <p>Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
-      </div>
-    </div>`;
+      <p style="font-size: 0.9rem; color: #374151; margin: 0 0 1rem;">Need immediate assistance? Email us at <a href="mailto:info@blackboxtech.online" style="color: #fb4545dc; text-decoration: none;">info@blackboxtech.online</a></p>
+      <p style="font-size: 0.9rem; color: #374151; margin: 0;">Best regards,<br/><strong>The BlackBox Tech Team</strong></p>
+    </div>
+    ${emailFooter()}
+  `);
 }

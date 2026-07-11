@@ -1,9 +1,10 @@
 // ─── Navigation ───────────────────────────────────────────────────────────────
 export const navLinks = [
   { label: "Home", href: "#home" },
-  { label: "Company", href: "#company" },
+  { label: "About Us", href: "/about" },
   { label: "Services", href: "#services" },
   { label: "Products", href: "#products" },
+  { label: "Awards", href: "#company" },
 ] as const;
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -306,28 +307,24 @@ export const portfolioItems = [
 // ─── Footer ───────────────────────────────────────────────────────────────────
 export const footerLinks = {
   company: [
-    { label: "About Us", href: "#company" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Press", href: "#" },
+    { label: "About Us", href: "/about" },
   ],
   services: [
-    { label: "Discovery", href: "#services" },
-    { label: "Design", href: "#services" },
-    { label: "Development", href: "#services" },
-    { label: "Growth", href: "#services" },
+    { label: "Discovery", href: "/#services" },
+    { label: "Design", href: "/#services" },
+    { label: "Development", href: "/#services" },
+    { label: "Growth", href: "/#services" },
   ],
   legal: [
-    { label: "Terms of Service", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Cookie Policy", href: "#" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Cookie Policy", href: "/cookies" },
   ],
 } as const;
 
 export const contactInfo = {
-  email: "hello@blackboxtech.co",
-  phone: "+27 10 000 0000",
-  address: "Johannesburg, South Africa",
+  email: "info@blackboxtech.online",
+  phone: "+234 805 020 5349",
   socials: {
     linkedin: "https://linkedin.com/company/blackboxtech",
     instagram: "https://instagram.com/blackboxtech",

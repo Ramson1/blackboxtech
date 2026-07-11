@@ -40,9 +40,11 @@ export function Header() {
     }
   }, [ctaOpen]);
 
-  // Track active section on scroll
+  // Track active section on scroll (only for hash-based links)
   useEffect(() => {
-    const sectionIds = navLinks.map((link) => link.href.replace("#", ""));
+    const sectionIds = navLinks
+      .filter((link) => link.href.startsWith("#"))
+      .map((link) => link.href.replace("#", ""));
     const observers: IntersectionObserver[] = [];
 
     sectionIds.forEach((id) => {
@@ -74,6 +76,13 @@ export function Header() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Helper to resolve nav link href
+  const resolveHref = (href: string) => {
+    if (href.startsWith("/")) return href;
+    if (isHome) return href;
+    return `/${href}`;
+  };
 
   return (
     <>
@@ -120,17 +129,22 @@ export function Header() {
           <div
             className="hidden md:flex"
             style={{
+              flex: 1,
+              justifyContent: "center",
               alignItems: "center",
               gap: "0.5rem",
             }}
           >
             {navLinks.map((link) => {
-              const isActive = activeLink === link.href;
+              const resolvedHref = resolveHref(link.href);
+              const isActive = link.href.startsWith("#") && activeLink === link.href;
+              const isPageActive = link.href.startsWith("/") && pathname === link.href;
+              const highlight = isActive || isPageActive;
               return (
-                <a
+                <Link
                   key={link.label}
-                  href={isHome ? link.href : `/${link.href}`}
-                  onClick={() => { setActiveLink(link.href); if (!isHome) { /* let browser navigate */ } }}
+                  href={resolvedHref}
+                  onClick={() => { if (link.href.startsWith("#")) setActiveLink(link.href); }}
                   style={{
                     padding: "0.375rem 0.875rem",
                     borderRadius: "9999px",
@@ -138,13 +152,13 @@ export function Header() {
                     fontWeight: 700,
                     textDecoration: "none",
                     transition: "all 0.2s",
-                    backgroundColor: isActive ? "#fb4545dc" : "rgba(255, 255, 255, 0.06)",
-                    color: isActive ? "#ffffff" : "#111111",
-                    boxShadow: isActive ? "0 2px 8px rgba(243,146,169,0.4)" : "none",
+                    backgroundColor: highlight ? "#fb4545dc" : "rgba(255, 255, 255, 0.06)",
+                    color: highlight ? "#ffffff" : "#111111",
+                    boxShadow: highlight ? "0 2px 8px rgba(243,146,169,0.4)" : "none",
                   }}
                 >
                   {link.label}
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -257,30 +271,36 @@ export function Header() {
               gap: "1rem",
             }}
           >
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={isHome ? link.href : `/${link.href}`}
-                onClick={() => {
-                  setActiveLink(link.href);
-                  setMenuOpen(false);
-                }}
-                style={{
-                  fontSize: "1.125rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  padding: "0.5rem 1.25rem",
-                  borderRadius: "9999px",
-                  backgroundColor: activeLink === link.href ? "#fb4545dc" : "rgba(255, 255, 255, 0.04)",
-                  color: activeLink === link.href ? "#ffffff" : "#1b1b1b",
-                  transition: "all 0.2s",
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const resolvedHref = resolveHref(link.href);
+              const isActive = link.href.startsWith("#") && activeLink === link.href;
+              const isPageActive = link.href.startsWith("/") && pathname === link.href;
+              const highlight = isActive || isPageActive;
+              return (
+                <Link
+                  key={link.label}
+                  href={resolvedHref}
+                  onClick={() => {
+                    if (link.href.startsWith("#")) setActiveLink(link.href);
+                    setMenuOpen(false);
+                  }}
+                  style={{
+                    fontSize: "1.125rem",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    padding: "0.5rem 1.25rem",
+                    borderRadius: "9999px",
+                    backgroundColor: highlight ? "#fb4545dc" : "rgba(255, 255, 255, 0.04)",
+                    color: highlight ? "#ffffff" : "#1b1b1b",
+                    transition: "all 0.2s",
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             {/* CTA Links */}
             <div style={{ width: "100%", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <Link
