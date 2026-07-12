@@ -18,12 +18,12 @@ export const heroContent = {
 
 // ─── Trust Logos ──────────────────────────────────────────────────────────────
 export const trustClients = [
-  { name: "LNEX" },
-  { name: "Rhema" },
-  { name: "Beautcia" },
-  { name: "Naasify" },
-  { name: "Standard Bank" },
-  { name: "Shoprite" },
+  { name: "LNEX", logo: "/trust/lnex.png" },
+  { name: "Rhema", logo: "/trust/rhema.png" },
+  { name: "Beautcia", logo: "/trust/beautcia.png" },
+  { name: "Naasify", logo: "/trust/naasify.png" },
+  { name: "MetaShares", logo: "/trust/metashares.png" },
+  { name: "LifeLink", logo: "/trust/lifelink.png" },
 ] as const;
 
 // ─── Metrics / Counters ───────────────────────────────────────────────────────

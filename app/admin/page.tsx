@@ -94,6 +94,7 @@ export default function AdminPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [whatsappToast, setWhatsappToast] = useState(false);
   const [detailRow, setDetailRow] = useState<Record<string, unknown> | null>(null);
   const [detailType, setDetailType] = useState<Tab>("student");
   const [statusFilter, setStatusFilter] = useState<string>("new");
@@ -212,6 +213,43 @@ export default function AdminPage() {
     setSendingEmail(false);
   };
 
+  // Open WhatsApp with auto-copied message
+  const handleWhatsApp = (row: Record<string, unknown>, type: Tab) => {
+    const phone = (row.parent_phone || row.phone || "") as string;
+    if (!phone) return;
+    const cleanPhone = phone.replace(/[\s+\-()]/g, "");
+    const name = (row.parent_name || row.full_name || row.name || "there") as string;
+    let message = `Hi ${name}, this is BlackBox Tech. `;
+    if (type === "student") {
+      const child = (row.child_name || "") as string;
+      const programs = Array.isArray(row.programs) ? (row.programs as string[]).join(", ") : (row.programs as string || "");
+      message += `Thank you for registering ${child || "your child"} for our ${programs || "training"} program. `;
+      message += "We've received your registration and will be in touch shortly with the next steps. ";
+      message += "Feel free to reach out if you have any questions!";
+    } else if (type === "professional") {
+      const programs = Array.isArray(row.programs) ? (row.programs as string[]).join(", ") : (row.programs as string || "");
+      message += `Thank you for your interest in our ${programs || "training"} program. `;
+      message += "We've received your registration and will get back to you shortly with enrollment details. ";
+      message += "Let us know if you have any questions!";
+    } else if (type === "build") {
+      const company = (row.company_name || "") as string;
+      const project = (row.project_type || "") as string;
+      message += `Thank you for your ${project || "software"} project request${company ? ` for ${company}` : ""}. `;
+      message += "Our team is reviewing your requirements and we'll get back to you shortly. ";
+      message += "Looking forward to working with you!";
+    } else {
+      message += "We received your message and appreciate you reaching out. ";
+      message += "Our team will review your message and get back to you shortly. ";
+      message += "Thank you for your patience!";
+    }
+    navigator.clipboard.writeText(message).then(() => {
+      setWhatsappToast(true);
+      setTimeout(() => setWhatsappToast(false), 3000);
+    });
+    const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
+  };
+
   // Logout
   const handleLogout = () => {
     setAuthenticated(false);
@@ -320,10 +358,9 @@ export default function AdminPage() {
     <>
     <style>{`html, body { background: #111 !important; margin: 0; padding: 0; }`}</style>
     <div className="min-h-screen bg-[#111] text-white">
-      {/* Header */}
-      <div className="bg-[#1a1a1a] border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">BlackBox Tech Admin</h1>
-        <div className="flex items-center gap-3">
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Action buttons */}
+        <div className="flex items-center justify-end gap-3 mb-6 mt-20">
           <button
             onClick={() => { setEmailTo(""); setEmailSubject(""); setEmailBody(""); setShowEmailModal(true); }}
             className="bg-[#fb4545dc] hover:bg-[#fb4545dc]/80 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
@@ -337,9 +374,7 @@ export default function AdminPage() {
             Logout
           </button>
         </div>
-      </div>
 
-      <div className="p-6 max-w-7xl mx-auto">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
@@ -537,6 +572,13 @@ export default function AdminPage() {
                               >
                                 Email
                               </button>
+                              <button
+                                onClick={() => handleWhatsApp(row, "student")}
+                                className="text-xs bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2 py-1 rounded transition-colors"
+                                title="Send WhatsApp"
+                              >
+                                WA
+                              </button>
                             </div>
                           </td>
                         </>
@@ -575,6 +617,13 @@ export default function AdminPage() {
                               >
                                 Email
                               </button>
+                              <button
+                                onClick={() => handleWhatsApp(row, "professional")}
+                                className="text-xs bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2 py-1 rounded transition-colors"
+                                title="Send WhatsApp"
+                              >
+                                WA
+                              </button>
                             </div>
                           </td>
                         </>
@@ -610,6 +659,13 @@ export default function AdminPage() {
                                 className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors"
                               >
                                 Email
+                              </button>
+                              <button
+                                onClick={() => handleWhatsApp(row, "build")}
+                                className="text-xs bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2 py-1 rounded transition-colors"
+                                title="Send WhatsApp"
+                              >
+                                WA
                               </button>
                             </div>
                           </td>
@@ -769,6 +825,14 @@ export default function AdminPage() {
             </div>
             <div className="mt-6 flex gap-3">
               <button onClick={() => setDetailRow(null)} className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg transition-colors">Close</button>
+              {Boolean(detailRow.parent_phone || detailRow.phone) && (
+                <button
+                  onClick={() => { handleWhatsApp(detailRow, detailType); setDetailRow(null); }}
+                  className="flex-1 bg-green-600/20 hover:bg-green-600/30 text-green-400 font-semibold py-3 rounded-lg transition-colors border border-green-600/30"
+                >
+                  WhatsApp
+                </button>
+              )}
               <button
                 onClick={() => {
                   const email = (detailRow.parent_email || detailRow.email || (detailRow as Record<string, unknown>).email) as string;
@@ -839,6 +903,14 @@ export default function AdminPage() {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* WhatsApp toast */}
+      {whatsappToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-bounce text-sm font-medium">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+          Message copied to clipboard! Paste it in WhatsApp.
         </div>
       )}
     </div>

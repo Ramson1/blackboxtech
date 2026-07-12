@@ -1,17 +1,92 @@
+"use client";
+
+import { useRef, useEffect, useCallback, useState } from "react";
+import Image from "next/image";
 import { trustClients } from "@/lib/content";
 
 export function TrustLogos() {
-  const brandList = (
-    <div className="flex items-center gap-6 md:gap-10 px-6">
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const singleSetWidthRef = useRef<number>(0);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const singleW = singleSetWidthRef.current;
+    if (singleW > 0 && el.scrollLeft >= singleW) {
+      el.scrollLeft -= singleW;
+    }
+  }, []);
+
+  // Auto-scroll animation loop
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const speed = 0.5;
+
+    const tick = (time: number) => {
+      if (!isPaused && el) {
+        if (lastTimeRef.current && time - lastTimeRef.current < 16) {
+          rafRef.current = requestAnimationFrame(tick);
+          return;
+        }
+        lastTimeRef.current = time;
+        el.scrollLeft += speed;
+        checkScroll();
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isPaused, checkScroll]);
+
+  // Measure single set width and start from center on mount
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Measure the first logoSet div width
+    const firstSet = el.firstElementChild as HTMLElement | null;
+    if (firstSet) {
+      singleSetWidthRef.current = firstSet.scrollWidth;
+    }
+    // Start from the middle copy
+    const mid = singleSetWidthRef.current;
+    el.scrollLeft = mid;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const logoSet = (
+    <div className="flex items-center gap-12 md:gap-16 px-6">
       {trustClients.map((client) => (
         <div
           key={client.name}
-          className="flex items-center gap-6 md:gap-10"
+          className="flex-shrink-0 flex items-center justify-center h-20 w-40 md:w-52"
         >
-          <span className="inline-flex items-center px-6 py-3 rounded-full bg-gray-50 border border-gray-100 text-base md:text-lg font-semibold text-dark/70 select-none whitespace-nowrap hover:border-crimson-100 hover:text-dark transition-colors">
-            {client.name}
-          </span>
-          <span className="text-gray-200 text-lg select-none">&bull;</span>
+          <Image
+            src={client.logo}
+            alt={client.name}
+            width={180}
+            height={64}
+            className="h-14 md:h-16 w-auto object-contain"
+            style={{
+              filter: "grayscale(100%)",
+              opacity: 0.6,
+              width: "auto",
+              height: "auto",
+              maxHeight: "4.5rem",
+              maxWidth: "12rem",
+            }}
+          />
         </div>
       ))}
     </div>
@@ -30,7 +105,11 @@ export function TrustLogos() {
       </div>
 
       {/* Scrolling marquee */}
-      <div className="relative overflow-hidden">
+      <div
+        className="relative overflow-hidden"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {/* Fade edges */}
         <div
           className="absolute inset-y-0 left-0 w-24 z-10 pointer-events-none"
@@ -45,12 +124,15 @@ export function TrustLogos() {
           }}
         />
         {/* Scrolling brands */}
-        <marquee behavior="scroll" direction="left" scrollamount="5">
-          <div className="flex">
-            {brandList}
-            {brandList}
-          </div>
-        </marquee>
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {logoSet}
+          {logoSet}
+          {logoSet}
+        </div>
       </div>
     </section>
   );
