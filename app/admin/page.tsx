@@ -352,7 +352,7 @@ export default function AdminPage() {
     });
   });
 
-  // ─── Dashboard ─────────────────────────────────────────────────────────────────
+  // ─── Dashboard ───────
 
   return (
     <>
