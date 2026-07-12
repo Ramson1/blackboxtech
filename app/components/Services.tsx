@@ -111,7 +111,7 @@ export function Services() {
                 <div>
                   <p className="text-sm font-semibold text-dark mb-1">On Desktop</p>
                   <p className="text-xs text-gray leading-relaxed">
-                    Click the <span className="font-bold text-dark">&quot;Get Started&quot;</span> button in the navigation bar at the top, then select the option you want from the dropdown menu.
+                    Click the <span className="font-bold text-dark">&quot;Get Started&quot;</span> button in the navigation bar at the top, then select the option you want — e.g. <span className="font-bold text-dark">Student Training</span>, <span className="font-bold text-dark">Professional Training</span>, or <span className="font-bold text-dark">Build My Software</span>.
                   </p>
                 </div>
               </div>
@@ -124,7 +124,7 @@ export function Services() {
                 <div>
                   <p className="text-sm font-semibold text-dark mb-1">On Mobile</p>
                   <p className="text-xs text-gray leading-relaxed">
-                    Tap the <span className="font-bold text-dark">menu button (☰)</span> at the top right, then select your preferred option from the menu list at the bottom.
+                    Tap the <span className="font-bold text-dark">menu button (☰)</span> at the top right, then select your preferred option from the menu list at the bottom — e.g. <span className="font-bold text-dark">Student Training</span>, <span className="font-bold text-dark">Professional Training</span>, or <span className="font-bold text-dark">Build My Software</span>.
                   </p>
                 </div>
               </div>
