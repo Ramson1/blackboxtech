@@ -3,6 +3,13 @@ import { supabase } from "@/lib/supabase";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
+const TABLE_MAP: Record<string, string> = {
+  student: "blackbox_student_registrations",
+  professional: "blackbox_professional_registrations",
+  build: "blackbox_build_requests",
+  contact: "blackbox_contact_messages",
+};
+
 function verifyAdmin(request: NextRequest): boolean {
   const password = request.headers.get("x-admin-password");
   return password === ADMIN_PASSWORD;
@@ -54,5 +61,31 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Admin fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  if (!verifyAdmin(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { type, id } = await request.json();
+    if (!type || !id) {
+      return NextResponse.json({ error: "type and id are required" }, { status: 400 });
+    }
+
+    const table = TABLE_MAP[type];
+    if (!table) {
+      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+    }
+
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return NextResponse.json({ error: "Failed to delete item" }, { status: 500 });
   }
 }

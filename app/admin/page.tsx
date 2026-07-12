@@ -99,6 +99,12 @@ export default function AdminPage() {
   const [detailType, setDetailType] = useState<Tab>("student");
   const [statusFilter, setStatusFilter] = useState<string>("new");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: Tab; id: string } | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editRow, setEditRow] = useState<Record<string, unknown> | null>(null);
+  const [editType, setEditType] = useState<Tab>("student");
+  const [editFields, setEditFields] = useState<Record<string, string>>({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // Get stored admin password from sessionStorage
   useEffect(() => {
@@ -248,6 +254,60 @@ export default function AdminPage() {
     });
     const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, "_blank");
+  };
+
+  // Delete item
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    try {
+      const res = await fetch("/api/admin/registrations", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+        body: JSON.stringify({ type: deleteConfirm.type, id: deleteConfirm.id }),
+      });
+      if (res.ok) {
+        fetchData();
+        setDeleteConfirm(null);
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
+  // Open edit modal
+  const openEdit = (row: Record<string, unknown>, type: Tab) => {
+    const editableFields: Record<string, string> = {};
+    const skip = ["id", "created_at", "status", "file_urls"];
+    Object.entries(row).forEach(([key, val]) => {
+      if (!skip.includes(key)) {
+        editableFields[key] = Array.isArray(val) ? val.join(", ") : String(val || "");
+      }
+    });
+    setEditRow(row);
+    setEditType(type);
+    setEditFields(editableFields);
+    setShowEditModal(true);
+  };
+
+  // Save edit
+  const handleSaveEdit = async () => {
+    if (!editRow) return;
+    setSavingEdit(true);
+    try {
+      const res = await fetch("/api/admin/edit", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+        body: JSON.stringify({ type: editType, id: editRow.id, fields: editFields }),
+      });
+      if (res.ok) {
+        fetchData();
+        setShowEditModal(false);
+        setEditRow(null);
+      }
+    } catch (err) {
+      console.error("Edit error:", err);
+    }
+    setSavingEdit(false);
   };
 
   // Logout
@@ -579,6 +639,20 @@ export default function AdminPage() {
                               >
                                 WA
                               </button>
+                              <button
+                                onClick={() => openEdit(row, "student")}
+                                className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded transition-colors"
+                                title="Edit"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ type: "student", id: row.id as string })}
+                                className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-2 py-1 rounded transition-colors"
+                                title="Delete"
+                              >
+                                Del
+                              </button>
                             </div>
                           </td>
                         </>
@@ -624,6 +698,20 @@ export default function AdminPage() {
                               >
                                 WA
                               </button>
+                              <button
+                                onClick={() => openEdit(row, "professional")}
+                                className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded transition-colors"
+                                title="Edit"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ type: "professional", id: row.id as string })}
+                                className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-2 py-1 rounded transition-colors"
+                                title="Delete"
+                              >
+                                Del
+                              </button>
                             </div>
                           </td>
                         </>
@@ -667,6 +755,20 @@ export default function AdminPage() {
                               >
                                 WA
                               </button>
+                              <button
+                                onClick={() => openEdit(row, "build")}
+                                className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded transition-colors"
+                                title="Edit"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ type: "build", id: row.id as string })}
+                                className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-2 py-1 rounded transition-colors"
+                                title="Delete"
+                              >
+                                Del
+                              </button>
                             </div>
                           </td>
                         </>
@@ -700,6 +802,20 @@ export default function AdminPage() {
                                 className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors"
                               >
                                 Email
+                              </button>
+                              <button
+                                onClick={() => openEdit(row, "contact")}
+                                className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded transition-colors"
+                                title="Edit"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ type: "contact", id: row.id as string })}
+                                className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-2 py-1 rounded transition-colors"
+                                title="Delete"
+                              >
+                                Del
                               </button>
                             </div>
                           </td>
@@ -911,6 +1027,59 @@ export default function AdminPage() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 animate-bounce text-sm font-medium">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
           Message copied to clipboard! Paste it in WhatsApp.
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setDeleteConfirm(null)}>
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-sm w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-full bg-red-600/20 flex items-center justify-center mb-4 mx-auto">
+              <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-white text-center mb-2">Delete Item?</h3>
+            <p className="text-gray-400 text-sm text-center mb-5">This action cannot be undone. The item will be permanently removed from the database.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteConfirm(null)} className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm">
+                Cancel
+              </button>
+              <button onClick={handleDelete} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit modal */}
+      {showEditModal && editRow && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setShowEditModal(false)}>
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white mb-4">Edit Item</h3>
+            <div className="space-y-3">
+              {Object.entries(editFields).map(([key, value]) => (
+                <div key={key}>
+                  <label className="text-xs text-gray-400 mb-1 block capitalize">{key.replace(/_/g, " ")}</label>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setEditFields({ ...editFields, [key]: e.target.value })}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-crimson-200 focus:outline-none transition-colors"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setShowEditModal(false)} className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm">
+                Cancel
+              </button>
+              <button onClick={handleSaveEdit} disabled={savingEdit} className="flex-1 bg-crimson-200 hover:bg-crimson-200/80 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm disabled:opacity-50">
+                {savingEdit ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
