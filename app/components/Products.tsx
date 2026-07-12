@@ -211,21 +211,14 @@ export function Products() {
                   : "bg-white border border-gray-100 hover:shadow-md hover:border-crimson-100"
               }`}
             >
-              <div
-                className={`w-12 h-12 rounded-xl mb-4 flex items-center justify-center ${
-                  featuredIndex === idx
-                    ? "bg-crimson-200"
-                    : "bg-gradient-to-br from-crimson-50 to-purple-50"
-                }`}
-              >
-                <span
-                  className={`text-lg font-black ${
-                    featuredIndex === idx ? "text-white" : "text-dark"
-                  }`}
-                >
-                  {product.name.charAt(0)}
-                </span>
-              </div>
+              <Image
+                src={product.logo}
+                alt={product.name}
+                width={48}
+                height={48}
+                className="mb-4 object-contain"
+                style={{ width: "4rem", height: "4rem" }}
+              />
               <h4
                 className={`text-lg font-bold mb-1 ${
                   featuredIndex === idx ? "text-white" : "text-dark"

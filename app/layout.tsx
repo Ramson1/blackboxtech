@@ -6,6 +6,8 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { CursorDots } from "./components/CursorDots";
 import { ChatWidget } from "./components/ChatWidget";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const plusJakarta = localFont({
   src: [
@@ -32,6 +34,9 @@ export const metadata: Metadata = {
   title: "BlackBox Tech — Discover. Design. Deliver.",
   description:
     "Full-cycle product development — from ideation to market-ready software. Discovery, design, engineering, and growth under one roof.",
+  icons: {
+    icon: "/logos/logoBlackPlain.png",
+  },
   openGraph: {
     title: "BlackBox Tech — Discover. Design. Deliver.",
     description:
@@ -60,6 +65,8 @@ export default async function RootLayout({
         <main className="flex-1">{children}</main>
         {!isAdmin && <Footer />}
         {!isAdmin && <ChatWidget />}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -148,6 +148,7 @@ export const budgetRanges = [
 export const inHouseProducts = [
   {
     name: "Beautcia",
+    logo: "/logos/beautcia.png",
     category: "Beauty Technology • Marketplace",
     description: "A digital beauty marketplace connecting clients with verified beauty professionals including hairstylists, barbers, makeup artists, nail technicians, estheticians, spas, and salons. Simplifies beauty service discovery, appointment booking, secure payments, and business management.",
     features: ["Appointment scheduling", "Service marketplace", "Online payments", "Business profile management", "Customer reviews & ratings", "Portfolio showcase", "Booking reminders", "Business analytics"],
@@ -157,6 +158,7 @@ export const inHouseProducts = [
   },
   {
     name: "LNEX Student App",
+    logo: "/logos/lnex.png",
     category: "EdTech",
     description: "A comprehensive digital campus platform that improves communication, learning, and academic administration within higher institutions. Centralizes student activities into a single mobile application.",
     features: ["Smart Attendance", "Academic Polls", "Assignments & Notes", "Student Community", "Marketplace", "Announcements", "Digital Student ID", "AI-powered learning tools"],
@@ -166,6 +168,7 @@ export const inHouseProducts = [
   },
   {
     name: "Rhema Expert Solutions",
+    logo: "/logos/rhema.png",
     category: "Technology Solutions Company",
     description: "A Nigerian technology company delivering innovative digital solutions for educational institutions, businesses, and organizations. Specializes in STEM education, software engineering, cybersecurity, AI, drone technology, IoT, and digital transformation.",
     features: ["Software Development", "Mobile & Web Applications", "STEM Robotics", "Coding Education", "Artificial Intelligence", "IoT", "Drone Technology", "Cyber Security"],
@@ -175,6 +178,7 @@ export const inHouseProducts = [
   },
   {
     name: "LifeLink MPCS",
+    logo: "/logos/lifelink.png",
     category: "Cooperative Management Platform",
     description: "A multipurpose cooperative management platform empowering members through structured programs covering finance, property, transportation, investments, and enterprise development. Digitizes cooperative operations while promoting transparency and accountability.",
     features: ["Member Management", "Savings & Contributions", "Loan Management", "Property Investment", "Cooperative Wallet", "Financial Reports", "Member Dashboard", "Enterprise Programs"],
@@ -184,6 +188,7 @@ export const inHouseProducts = [
   },
   {
     name: "MetaShares",
+    logo: "/logos/metashare.png",
     category: "Investment Technology",
     description: "A digital investment and asset-sharing platform enabling individuals and organizations to participate in collective investment opportunities through secure and transparent technology. Simplifies asset ownership, portfolio tracking, and collaborative wealth creation.",
     features: ["Investment Portfolio", "Shared Asset Management", "Member Dashboard", "Investment Tracking", "Performance Analytics", "Secure Transactions", "Financial Reports"],
@@ -193,6 +198,7 @@ export const inHouseProducts = [
   },
   {
     name: "QR Code Generator & Scanner",
+    logo: "/logos/qrcodegenerator.png",
     category: "Productivity Tool",
     description: "A modern QR code solution enabling users to generate, customize, and scan QR codes for business, education, events, marketing, attendance systems, inventory management, and digital payments.",
     features: ["QR Code Generation", "QR Code Scanning", "Attendance Verification", "Business Cards", "Wi-Fi Sharing", "Event Tickets", "Product Tracking", "Download & Share"],
@@ -202,6 +208,7 @@ export const inHouseProducts = [
   },
   {
     name: "Resume Builder",
+    logo: "/logos/resume builder.png",
     category: "Career Technology",
     description: "An intelligent platform helping job seekers create professional resumes and CVs within minutes. Choose from modern templates, receive AI-powered writing assistance, and export resumes in multiple formats.",
     features: ["AI Resume Writing", "Professional Templates", "Cover Letter Generator", "PDF Export", "ATS-Friendly Layouts", "Skills Suggestions", "Resume Preview"],
@@ -211,6 +218,7 @@ export const inHouseProducts = [
   },
   {
     name: "TokenVault",
+    logo: "/logos/tokenvault.png",
     category: "Web3 • Blockchain",
     description: "A Web3 platform simplifying cryptocurrency distribution through automated airdrops, gifting, and token management. Enables projects, communities, and individuals to securely distribute digital assets with a seamless blockchain experience.",
     features: ["Crypto Airdrops", "Token Gifting", "Wallet Integration", "Multi-chain Support", "Campaign Management", "Transaction History", "Secure Asset Distribution"],
@@ -220,6 +228,7 @@ export const inHouseProducts = [
   },
   {
     name: "PayTracker",
+    logo: "/logos/paytracker.png",
     category: "FinTech",
     description: "A financial management platform helping individuals and businesses monitor income, expenses, invoices, subscriptions, and payment activities. Provides real-time financial insights that improve budgeting and cash flow management.",
     features: ["Income Tracking", "Expense Management", "Invoice Management", "Subscription Monitoring", "Financial Reports", "Budget Planning", "Payment History", "Analytics Dashboard"],
@@ -229,6 +238,7 @@ export const inHouseProducts = [
   },
   {
     name: "Gift Idea Generator",
+    logo: "/logos/giftidea.png",
     category: "Artificial Intelligence",
     description: "An AI-powered recommendation platform helping users discover thoughtful gift ideas based on recipient's age, gender, interests, hobbies, career, personality, relationship, budget, and special occasions. Generates personalized recommendations in seconds.",
     features: ["AI Gift Recommendations", "Budget-based Suggestions", "Occasion-based Gifts", "Age & Gender Filtering", "Hobby & Career Matching", "Personalized Gift Lists", "Smart Search"],
@@ -238,6 +248,7 @@ export const inHouseProducts = [
   },
   {
     name: "LifeLink",
+    logo: "/logos/lifelink.png",
     category: "Cooperative Technology",
     description: "A digital ecosystem modernizing cooperative society operations by providing members with secure access to savings, investments, loans, financial records, enterprise opportunities, and community engagement through an intuitive platform.",
     features: ["Digital Cooperative Management", "Member Portal", "Loan Processing", "Savings Tracking", "Investment Programs", "Notifications", "Reports & Analytics"],
@@ -247,6 +258,7 @@ export const inHouseProducts = [
   },
   {
     name: "Rhema CBT Exam",
+    logo: "/logos/rhema.png",
     category: "Education Technology",
     description: "A secure Computer-Based Testing platform designed for schools, training institutions, and organizations. Streamlines examination administration, automates grading, and delivers detailed performance analytics.",
     features: ["Online Examinations", "Question Bank Management", "Automatic Grading", "Student Authentication", "Result Analytics", "Exam Scheduling", "Anti-cheating Measures", "Performance Reports"],
