@@ -66,6 +66,7 @@ export default function ProfessionalRegistrationPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#fb4545dc" }}>
+      <div style={{ height: "5rem" }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-4 text-center overflow-hidden -mt-20" style={{ background: "linear-gradient(135deg, #ddd7fd 0%, #fb4545dc 100%)" }}>
         <div className="relative z-10 max-w-3xl mx-auto">

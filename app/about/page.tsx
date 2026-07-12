@@ -7,6 +7,7 @@ import { metrics } from "@/lib/content";
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-dark text-white">
+      <div style={{ height: "5rem" }} />
       {/* Hero Header */}
       <section className="pt-32 pb-16 px-4 text-center -mt-20 relative">
         <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(251,69,69,0.12) 0%, transparent 60%)" }} />

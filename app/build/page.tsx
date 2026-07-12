@@ -96,6 +96,7 @@ export default function BuildPage() {
 
   return (
     <div className="min-h-screen bg-dark text-white">
+      <div style={{ height: "5rem" }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-4 text-center overflow-hidden -mt-20">
         <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(251,69,69,0.15) 0%, transparent 60%)" }} />

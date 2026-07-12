@@ -13,6 +13,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState(isHome ? "#home" : "");
   const [ctaOpen, setCtaOpen] = useState(false);
+  const [activeBtn, setActiveBtn] = useState("");
   const ctaRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [btnPos, setBtnPos] = useState({ top: 0, right: 0 });
@@ -315,49 +316,36 @@ export function Header() {
               <Link
                 href="/register/student"
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  padding: "0.5rem 1.25rem",
-                  borderRadius: "9999px",
-                  backgroundColor: "#fb4545dc",
-                  color: "#ffffff",
-                  textAlign: "center",
-                }}
+                className="block text-center text-base font-semibold text-dark/80 hover:text-white hover:bg-[#fb4545dc] active:bg-[#fb4545dc] active:text-white px-5 py-2.5 rounded-full transition-all"
+                style={{ backgroundColor: activeBtn === "student" ? "#fb4545dc" : "rgba(0,0,0,0.05)", color: activeBtn === "student" ? "#ffffff" : undefined }}
+                onMouseDown={() => setActiveBtn("student")}
+                onMouseUp={() => setActiveBtn("")}
+                onTouchStart={() => setActiveBtn("student")}
+                onTouchEnd={() => setActiveBtn("")}
               >
                 Student Training
               </Link>
               <Link
                 href="/register/professional"
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  padding: "0.5rem 1.25rem",
-                  borderRadius: "9999px",
-                  backgroundColor: "#fb4545dc",
-                  color: "#ffffff",
-                  textAlign: "center",
-                }}
+                className="block text-center text-base font-semibold text-dark/80 hover:text-white hover:bg-[#fb4545dc] active:bg-[#fb4545dc] active:text-white px-5 py-2.5 rounded-full transition-all"
+                style={{ backgroundColor: activeBtn === "professional" ? "#fb4545dc" : "rgba(0,0,0,0.05)", color: activeBtn === "professional" ? "#ffffff" : undefined }}
+                onMouseDown={() => setActiveBtn("professional")}
+                onMouseUp={() => setActiveBtn("")}
+                onTouchStart={() => setActiveBtn("professional")}
+                onTouchEnd={() => setActiveBtn("")}
               >
                 Professional Training
               </Link>
               <Link
                 href="/build"
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  padding: "0.5rem 1.25rem",
-                  borderRadius: "9999px",
-                  backgroundColor: "#1b1b1b",
-                  color: "#ffffff",
-                  textAlign: "center",
-                  border: "1.5px solid rgba(255,255,255,0.3)",
-                }}
+                className="block text-center text-base font-semibold text-dark/80 hover:text-white hover:bg-dark active:bg-dark active:text-white px-5 py-2.5 rounded-full border border-dark/10 transition-all"
+                style={{ backgroundColor: activeBtn === "build" ? "#1b1b1b" : "rgba(0,0,0,0.03)", color: activeBtn === "build" ? "#ffffff" : undefined }}
+                onMouseDown={() => setActiveBtn("build")}
+                onMouseUp={() => setActiveBtn("")}
+                onTouchStart={() => setActiveBtn("build")}
+                onTouchEnd={() => setActiveBtn("")}
               >
                 Build My Software
               </Link>

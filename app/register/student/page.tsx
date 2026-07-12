@@ -66,6 +66,7 @@ export default function StudentRegistrationPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#fb4545dc" }}>
+      <div style={{ height: "5rem" }} />
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-4 text-center overflow-hidden -mt-20" style={{ background: "linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%)" }}>
         <div className="relative z-10 max-w-3xl mx-auto">
