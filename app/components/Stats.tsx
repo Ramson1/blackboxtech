@@ -34,10 +34,11 @@ function StatCounter({
 
 export function Stats() {
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-br from-dark via-[#222] to-dark relative overflow-hidden">
-      {/* Subtle decorative circles */}
-      <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-crimson-200/5 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full bg-purple-200/5 blur-3xl pointer-events-none" />
+    <section className="py-20 md:py-28 bg-dark relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-[-100%] animate-gradient-rotate" style={{ background: "conic-gradient(from 0deg at 50% 50%, #1b1b1b 0deg, #fb454540 72deg, #222222 144deg, #ddd7fd30 216deg, #1b1b1b 288deg, #fb454540 360deg)", filter: "blur(60px)", opacity: 0.9 }} />
+      </div>
 
       {/* Heading */}
       <div className="text-center mb-14 px-4 relative z-10">

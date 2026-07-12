@@ -102,9 +102,13 @@ export function Products() {
   };
 
   return (
-    <section id="products" className="py-20 md:py-28 bg-gradient-to-b from-white via-purple-50/20 to-white overflow-hidden">
+    <section id="products" className="py-20 md:py-28 bg-white relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-[-100%] animate-gradient-rotate" style={{ background: "conic-gradient(from 0deg at 50% 50%, #fbbcbc 0deg, #ffffff 72deg, #ddd7fd 144deg, #ffffff 216deg, #fde8e8 288deg, #fbbcbc 360deg)", filter: "blur(60px)", opacity: 0.5 }} />
+      </div>
       {/* Heading */}
-      <div className="text-center mb-16 px-4">
+      <div className="text-center mb-16 px-4 relative z-10">
         <p className="text-xs font-semibold text-crimson-200 uppercase tracking-[0.25em] mb-2">
           What We&apos;ve Built
         </p>
@@ -117,7 +121,7 @@ export function Products() {
       </div>
 
       {/* Featured product showcase */}
-      <div className="max-w-6xl mx-auto px-4 mb-16">
+      <div className="max-w-6xl mx-auto px-4 mb-16 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Device mockups */}
           <div className="order-2 lg:order-1">
@@ -152,7 +156,7 @@ export function Products() {
       </div>
 
       {/* Scrollable product cards with nav buttons */}
-      <div className="relative">
+      <div className="relative z-10">
         {/* Left button */}
         <button
           onClick={() => scroll("left")}
@@ -249,7 +253,7 @@ export function Products() {
       </div>
 
       {/* View All button */}
-      <div className="text-center mt-12">
+      <div className="text-center mt-12 relative z-10">
         <a
           href="/products"
           className="inline-flex items-center gap-2 rounded-full bg-dark px-8 py-3.5 text-base font-medium text-white hover:bg-dark/80 transition-colors border-2 border-white shadow-lg"

@@ -7,10 +7,14 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="pt-4 pb-20 md:pt-12 md:pb-28 px-4 text-center bg-white"
+      className="pt-4 pb-20 md:pt-12 md:pb-28 px-4 text-center bg-white relative overflow-hidden"
     >
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-[-100%] animate-gradient-rotate" style={{ background: "conic-gradient(from 0deg at 50% 50%, #fb4545 0deg, #ffffff 72deg, #ddd7fd 144deg, #ffffff 216deg, #fb4545 288deg, #ffffff 360deg)", filter: "blur(80px)", opacity: 0.3 }} />
+      </div>
       {/* Scrolling announcement banner */}
-      <div className="w-[80%] md:w-1/2 mx-auto mb-10 relative h-6">
+      <div className="w-[80%] md:w-1/2 mx-auto mb-10 relative h-6 z-10 mt-20">
         {/* Fade edges */}
         <div
           className="absolute inset-y-0 left-0 w-16 z-10 pointer-events-none"
@@ -37,7 +41,7 @@ export function Hero() {
         </marquee>
       </div>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Large landscape logo */}
         <div className="w-[45%] mx-auto mb-8 drop-shadow-5xl bg-black border-4 border-white rounded-full">
           <Image

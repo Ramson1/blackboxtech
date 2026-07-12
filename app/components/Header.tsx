@@ -388,9 +388,6 @@ export function Header() {
         )}
       </header>
 
-      {/* Spacer */}
-      <div style={{ height: "5rem" }} />
-
       {/* CTA Dropdown rendered via portal to avoid nav clipping */}
       {ctaOpen && typeof document !== "undefined" && createPortal(
         <div ref={dropdownRef} style={{

@@ -4,9 +4,13 @@ const bgColors = ["bg-purple-50", "bg-crimson-50", "bg-purple-50", "bg-crimson-5
 
 export function Services() {
   return (
-    <section id="services" className="py-20 md:py-28 bg-white">
+    <section id="services" className="py-20 md:py-28 bg-white relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-[-100%] animate-gradient-rotate" style={{ background: "conic-gradient(from 0deg at 50% 50%, #ddd7fd 0deg, #ffffff 72deg, #fde8e8 144deg, #ffffff 216deg, #fbbcbc 288deg, #ddd7fd 360deg)", filter: "blur(60px)", opacity: 0.5 }} />
+      </div>
       {/* Main services */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-dark mb-4">
           Our Full-Cycle Product Development Services
         </h2>
@@ -42,7 +46,7 @@ export function Services() {
       </div>
 
       {/* Software Training */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 relative z-10">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-crimson-200 uppercase tracking-[0.25em] mb-2">
             Level Up Your Skills

@@ -24,6 +24,7 @@
 
   /* Animations */
   --animate-marquee: marquee 12s linear infinite;
+  --animate-gradient-rotate: gradient-rotate 6s linear infinite;
 }
 
 /* Smooth scroll for anchor links */
@@ -76,6 +77,16 @@ body {
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* Animated gradient: continuous rotation */
+@keyframes gradient-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 

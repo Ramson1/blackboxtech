@@ -11,11 +11,12 @@ export function Awards() {
   return (
     <section
       id="company"
-      className="py-20 md:py-28 bg-gradient-to-b from-dark via-[#1a1a2e] to-dark relative overflow-hidden"
+      className="py-20 md:py-28 bg-dark relative overflow-hidden"
     >
-      {/* Background glow effects */}
-      <div className="absolute top-1/4 -left-32 w-80 h-80 rounded-full bg-crimson-200/8 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-80 h-80 rounded-full bg-purple-200/8 blur-[100px] pointer-events-none" />
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-[-100%] animate-gradient-rotate" style={{ background: "conic-gradient(from 0deg at 50% 50%, #1b1b1b 0deg, #fb4545 72deg, #1a1a2e 144deg, #ddd7fd 216deg, #1b1b1b 288deg, #fb4545 360deg)", filter: "blur(100px)", opacity: 0.25 }} />
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Heading */}
