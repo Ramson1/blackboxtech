@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { metrics } from "@/lib/content";
@@ -106,12 +108,12 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-white mb-3">Ready to build something great?</h2>
         <p className="text-white/50 mb-6">Let&apos;s turn your idea into a market-ready product.</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/#contact"
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("open-chat"))}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#fb4545dc] hover:bg-[#fb4545dc]/80 text-white font-semibold text-sm transition-colors"
           >
             Let&apos;s Chat
-          </Link>
+          </button>
           <Link
             href="/build"
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors"

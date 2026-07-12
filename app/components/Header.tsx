@@ -11,7 +11,7 @@ export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("#home");
+  const [activeLink, setActiveLink] = useState(isHome ? "#home" : "");
   const [ctaOpen, setCtaOpen] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -76,6 +76,15 @@ export function Header() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Reset active link when navigating between pages
+  useEffect(() => {
+    if (isHome) {
+      setActiveLink("#home");
+    } else {
+      setActiveLink("");
+    }
+  }, [pathname, isHome]);
 
   // Helper to resolve nav link href
   const resolveHref = (href: string) => {
