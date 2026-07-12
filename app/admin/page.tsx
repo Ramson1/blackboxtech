@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -227,6 +228,14 @@ export default function AdminPage() {
       <div className="min-h-screen bg-[#111] flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
+            <Image
+              src="/logos/logoWhitePlain.png"
+              alt="BlackBox Tech"
+              width={100}
+              height={100}
+              className="object-contain mx-auto mb-4"
+              style={{ width: "auto", height: "auto" }}
+            />
             <h1 className="text-2xl font-bold text-white mb-2">BlackBox Tech Admin</h1>
             <p className="text-gray-400 text-sm">Enter your admin password to continue</p>
           </div>
