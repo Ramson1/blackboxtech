@@ -3,6 +3,7 @@ import { TrustLogos } from "./components/TrustLogos";
 import { Stats } from "./components/Stats";
 import { Services } from "./components/Services";
 import { Products } from "./components/Products";
+import { BlogPreview } from "./components/BlogPreview";
 import { Awards } from "./components/Awards";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <Stats />
       <Services />
       <Products />
+      <BlogPreview />
       <Awards />
     </>
   );

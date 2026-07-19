@@ -4,6 +4,7 @@ export const navLinks = [
   { label: "About Us", href: "/about" },
   { label: "Services", href: "#services" },
   { label: "Products", href: "#products" },
+  { label: "Blog", href: "/blog" },
   { label: "Awards", href: "#company" },
 ] as const;
 
@@ -320,6 +321,7 @@ export const portfolioItems = [
 export const footerLinks = {
   company: [
     { label: "About Us", href: "/about" },
+    { label: "Blog", href: "/blog" },
   ],
   services: [
     { label: "Discovery", href: "/#services" },

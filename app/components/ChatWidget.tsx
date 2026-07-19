@@ -73,6 +73,7 @@ export function ChatWidget() {
       {/* Floating chat button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
         style={{
           position: "fixed",
           bottom: "1.5rem",
@@ -91,7 +92,6 @@ export function ChatWidget() {
           boxShadow: "0 8px 24px rgba(243,146,169,0.4)",
           transition: "transform 0.2s, box-shadow 0.2s",
         }}
-        aria-label={isOpen ? "Close chat" : "Open chat"}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "scale(1.1)";
           e.currentTarget.style.boxShadow = "0 12px 32px rgba(243,146,169,0.5)";

@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { blogCategories } from "@/lib/blog-data";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
-type Tab = "student" | "professional" | "build" | "contact";
+type Tab = "student" | "professional" | "build" | "contact" | "blogs";
 
 interface DashboardData {
   student: Record<string, unknown>[];
@@ -21,6 +22,7 @@ const STATUS_OPTIONS: Record<Tab, string[]> = {
   professional: ["new", "contacted", "enrolled", "cancelled"],
   build: ["new", "reviewing", "in_progress", "completed", "cancelled"],
   contact: ["new", "read", "replied"],
+  blogs: ["published", "draft"],
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -105,6 +107,12 @@ export default function AdminPage() {
   const [editType, setEditType] = useState<Tab>("student");
   const [editFields, setEditFields] = useState<Record<string, string>>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [blogs, setBlogs] = useState<Record<string, unknown>[]>([]);
+  const [showBlogEditor, setShowBlogEditor] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<Record<string, unknown> | null>(null);
+  const [blogForm, setBlogForm] = useState({ title: "", slug: "", excerpt: "", content: "", cover_image: "", category: "Software Development", tags: "", status: "draft" });
+  const [savingBlog, setSavingBlog] = useState(false);
+  const [seedingBlogs, setSeedingBlogs] = useState(false);
 
   // Get stored admin password from sessionStorage
   useEffect(() => {
@@ -163,6 +171,116 @@ export default function AdminPage() {
   useEffect(() => {
     if (authenticated) fetchData();
   }, [authenticated, fetchData]);
+
+  // Fetch blogs
+  const fetchBlogs = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/blogs", {
+        headers: { "x-admin-password": adminPassword() },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setBlogs(json || []);
+      }
+    } catch (err) {
+      console.error("Blog fetch error:", err);
+    }
+  }, [adminPassword]);
+
+  useEffect(() => {
+    if (authenticated) fetchBlogs();
+  }, [authenticated, fetchBlogs]);
+
+  // Seed blogs
+  const handleSeedBlogs = async () => {
+    setSeedingBlogs(true);
+    try {
+      const { blogPosts } = await import("@/lib/blog-data");
+      let count = 0;
+      for (const post of blogPosts) {
+        const res = await fetch("/api/admin/blogs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+          body: JSON.stringify(post),
+        });
+        if (res.ok) count++;
+      }
+      alert(`${count} blog posts seeded successfully!`);
+      fetchBlogs();
+    } catch (err) {
+      console.error("Seed error:", err);
+      alert("Failed to seed blogs");
+    }
+    setSeedingBlogs(false);
+  };
+
+  // Open blog editor
+  const openBlogEditor = (blog?: Record<string, unknown>) => {
+    if (blog) {
+      setEditingBlog(blog);
+      setBlogForm({
+        title: (blog.title as string) || "",
+        slug: (blog.slug as string) || "",
+        excerpt: (blog.excerpt as string) || "",
+        content: (blog.content as string) || "",
+        cover_image: (blog.cover_image as string) || "",
+        category: (blog.category as string) || "Software Development",
+        tags: Array.isArray(blog.tags) ? (blog.tags as string[]).join(", ") : (blog.tags as string) || "",
+        status: (blog.status as string) || "draft",
+      });
+    } else {
+      setEditingBlog(null);
+      setBlogForm({ title: "", slug: "", excerpt: "", content: "", cover_image: "", category: "Software Development", tags: "", status: "draft" });
+    }
+    setShowBlogEditor(true);
+  };
+
+  // Save blog
+  const handleSaveBlog = async () => {
+    if (!blogForm.title || !blogForm.content) return;
+    setSavingBlog(true);
+    const slug = blogForm.slug || blogForm.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const payload = {
+      ...blogForm,
+      slug,
+      tags: blogForm.tags.split(",").map((t) => t.trim()).filter(Boolean),
+      ...(editingBlog ? {} : {}),
+    };
+    try {
+      if (editingBlog) {
+        await fetch("/api/admin/blogs", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+          body: JSON.stringify({ id: editingBlog.id, ...payload }),
+        });
+      } else {
+        await fetch("/api/admin/blogs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+          body: JSON.stringify(payload),
+        });
+      }
+      setShowBlogEditor(false);
+      fetchBlogs();
+    } catch (err) {
+      console.error("Blog save error:", err);
+    }
+    setSavingBlog(false);
+  };
+
+  // Delete blog
+  const handleDeleteBlog = async (id: string) => {
+    try {
+      await fetch("/api/admin/blogs", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": adminPassword() },
+        body: JSON.stringify({ id }),
+      });
+      fetchBlogs();
+    } catch (err) {
+      console.error("Blog delete error:", err);
+    }
+  };
 
   // Update status
   const updateStatus = async (type: Tab, id: string, status: string) => {
@@ -394,9 +512,10 @@ export default function AdminPage() {
     { key: "professional", label: "Professionals", count: data.professional.length },
     { key: "build", label: "Build Requests", count: data.build.length },
     { key: "contact", label: "Contacts", count: data.contact.length },
+    { key: "blogs", label: "Blogs", count: blogs.length },
   ];
 
-  const currentData = data[activeTab];
+  const currentData: Record<string, unknown>[] = activeTab === "blogs" ? [] : (data[activeTab as keyof DashboardData] || []);
 
   // Filter by status and search query
   const filteredData = currentData.filter((row) => {
@@ -474,70 +593,127 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Filter Buttons + Search */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
-          <div className="flex gap-1.5 overflow-x-auto flex-1">
-            <button
-              onClick={() => setStatusFilter("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                statusFilter === "all"
-                  ? "bg-white/20 text-white"
-                  : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              All ({currentData.length})
-            </button>
-            {STATUS_OPTIONS[activeTab].map((status) => {
-              const count = currentData.filter((r) => (r.status as string || "new") === status).length;
-              return (
+        {/* Filter Buttons + Search - Hidden for blogs tab */}
+        {activeTab !== "blogs" && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <div className="flex gap-1.5 overflow-x-auto flex-1">
                 <button
-                  key={status}
-                  onClick={() => setStatusFilter(status)}
+                  onClick={() => setStatusFilter("all")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                    statusFilter === status
-                      ? STATUS_COLORS[status] || "bg-white/20 text-white"
+                    statusFilter === "all"
+                      ? "bg-white/20 text-white"
                       : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  {status} ({count})
+                  All ({currentData.length})
                 </button>
-              );
-            })}
-          </div>
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search anything..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 w-full sm:w-56"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                {STATUS_OPTIONS[activeTab].map((status) => {
+                  const count = currentData.filter((r) => (r.status as string || "new") === status).length;
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                        statusFilter === status
+                          ? STATUS_COLORS[status] || "bg-white/20 text-white"
+                          : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {status} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                 </svg>
-              </button>
-            )}
-          </div>
-        </div>
+                <input
+                  type="text"
+                  placeholder="Search anything..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-[#1a1a1a] border border-white/10 rounded-lg pl-9 pr-3 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 w-full sm:w-56"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
 
-        {/* Results count */}
-        {(searchQuery || statusFilter !== "all") && (
-          <p className="text-xs text-gray-500 mb-3">
-            Showing {filteredData.length} of {currentData.length} entries
-            {searchQuery && <span> for &quot;{searchQuery}&quot;</span>}
-          </p>
+            {/* Results count */}
+            {(searchQuery || statusFilter !== "all") && (
+              <p className="text-xs text-gray-500 mb-3">
+                Showing {filteredData.length} of {currentData.length} entries
+                {searchQuery && <span> for &quot;{searchQuery}&quot;</span>}
+              </p>
+            )}
+          </>
+        )}
+
+        {/* Blog Management Section */}
+        {activeTab === "blogs" && (
+          <div className="bg-[#1a1a1a] rounded-xl border border-white/10 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex gap-2">
+                <button onClick={() => openBlogEditor()} className="text-xs bg-crimson-200 hover:bg-crimson-200/80 text-white px-4 py-2 rounded-lg transition-colors">
+                  + New Blog Post
+                </button>
+                <button onClick={handleSeedBlogs} disabled={seedingBlogs} className="text-xs bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50">
+                  {seedingBlogs ? "Seeding..." : "Seed 22 Blog Posts"}
+                </button>
+              </div>
+              <span className="text-xs text-gray-400">{blogs.length} posts</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 text-gray-400 text-left">
+                    <th className="px-4 py-3 font-medium">Title</th>
+                    <th className="px-4 py-3 font-medium">Category</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium">Date</th>
+                    <th className="px-4 py-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {blogs.map((blog) => (
+                    <tr key={blog.id as string} className="border-b border-white/5 hover:bg-white/5">
+                      <td className="px-4 py-3 font-medium text-white max-w-xs truncate">{blog.title as string}</td>
+                      <td className="px-4 py-3 text-gray-400">{blog.category as string}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${(blog.status as string) === "published" ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
+                          {blog.status as string}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-xs">{new Date(blog.published_at as string || blog.created_at as string).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button onClick={() => openBlogEditor(blog)} className="text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded transition-colors">Edit</button>
+                          <button onClick={() => { if (confirm("Delete this blog post?")) handleDeleteBlog(blog.id as string); }} className="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-2 py-1 rounded transition-colors">Del</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {blogs.length === 0 && (
+                    <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No blog posts yet. Click "Seed 22 Blog Posts" to add sample content.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
 
         {/* Data Table */}
-        {filteredData.length === 0 ? (
+        {activeTab !== "blogs" && filteredData.length === 0 ? (
           <div className="bg-[#1a1a1a] rounded-xl p-12 text-center border border-white/10">
             <p className="text-gray-500">{currentData.length === 0 ? "No entries yet" : "No matching entries"}</p>
           </div>
@@ -1047,6 +1223,140 @@ export default function AdminPage() {
               </button>
               <button onClick={handleDelete} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm">
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Blog Editor Modal */}
+      {showBlogEditor && (
+        <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl w-full max-w-3xl my-8 shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-white/10 sticky top-0 bg-[#1a1a1a] rounded-t-2xl z-10">
+              <h2 className="text-lg font-bold text-white">{editingBlog ? "Edit Blog Post" : "New Blog Post"}</h2>
+              <button onClick={() => { setShowBlogEditor(false); setEditingBlog(null); }} className="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div className="p-5 space-y-4">
+              {/* Title */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">Title</label>
+                <input
+                  type="text"
+                  value={blogForm.title}
+                  onChange={(e) => {
+                    const title = e.target.value;
+                    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                    setBlogForm({ ...blogForm, title, slug });
+                  }}
+                  className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors"
+                  placeholder="Enter blog post title..."
+                />
+              </div>
+              {/* Slug */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">Slug (URL)</label>
+                <input
+                  type="text"
+                  value={blogForm.slug}
+                  onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
+                  className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors font-mono text-sm"
+                  placeholder="blog-post-url-slug"
+                />
+              </div>
+              {/* Excerpt */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">Excerpt</label>
+                <textarea
+                  value={blogForm.excerpt}
+                  onChange={(e) => setBlogForm({ ...blogForm, excerpt: e.target.value })}
+                  rows={2}
+                  className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors resize-none"
+                  placeholder="Short summary of the blog post..."
+                />
+              </div>
+              {/* Cover Image + Category row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">Cover Image URL</label>
+                  <input
+                    type="text"
+                    value={blogForm.cover_image}
+                    onChange={(e) => setBlogForm({ ...blogForm, cover_image: e.target.value })}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors text-sm"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">Category</label>
+                  <select
+                    value={blogForm.category}
+                    onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors text-sm"
+                  >
+                    {blogCategories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {/* Tags + Status row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={blogForm.tags}
+                    onChange={(e) => setBlogForm({ ...blogForm, tags: e.target.value })}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors text-sm"
+                    placeholder="react, nextjs, web development"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 mb-1 block">Status</label>
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setBlogForm({ ...blogForm, status: "draft" })}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${blogForm.status === "draft" ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30" : "bg-white/5 text-gray-500 hover:bg-white/10"}`}
+                    >
+                      Draft
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBlogForm({ ...blogForm, status: "published" })}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${blogForm.status === "published" ? "bg-green-500/20 text-green-300 border border-green-500/30" : "bg-white/5 text-gray-500 hover:bg-white/10"}`}
+                    >
+                      Published
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Content */}
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">Content (HTML)</label>
+                <textarea
+                  value={blogForm.content}
+                  onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                  rows={16}
+                  className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[#fb4545dc] focus:outline-none transition-colors font-mono text-sm leading-relaxed resize-y"
+                  placeholder="<h2>Section Title</h2>&#10;<p>Blog content goes here...</p>"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 p-5 border-t border-white/10 sticky bottom-0 bg-[#1a1a1a] rounded-b-2xl">
+              <button
+                onClick={() => { setShowBlogEditor(false); setEditingBlog(null); }}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveBlog}
+                disabled={savingBlog || !blogForm.title || !blogForm.slug || !blogForm.content}
+                className="flex-1 bg-[#fb4545dc] hover:bg-[#fb4545dc]/80 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50"
+              >
+                {savingBlog ? "Saving..." : editingBlog ? "Update Post" : "Create Post"}
               </button>
             </div>
           </div>
