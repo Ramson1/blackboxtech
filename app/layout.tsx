@@ -36,11 +36,18 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blackboxtech.onlin
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "BlackBox Tech — Discover. Design. Deliver.",
+    default: "BlackBox Tech — Software Development, Training & AI Solutions | Nigeria",
     template: "%s | BlackBox Tech",
   },
   description:
-    "Full-cycle product development — from ideation to market-ready software. Discovery, design, engineering, and growth under one roof. Software training, custom development, and AI-powered solutions.",
+    "BlackBox Tech is a Nigeria-based full-cycle software development company. We build custom web & mobile apps, AI solutions, and provide professional software training. From startup MVPs to enterprise systems — discover, design, deliver.",
+  category: "technology",
+  creator: "BlackBox Tech Team",
+  publisher: "BlackBox Tech",
+  formatDetection: {
+    email: true,
+    telephone: true,
+  },
   keywords: [
     "software development",
     "web development",
@@ -77,19 +84,19 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
   },
   openGraph: {
-    title: "BlackBox Tech — Discover. Design. Deliver.",
+    title: "BlackBox Tech — Software Development, Training & AI Solutions | Nigeria",
     description:
-      "Full-cycle product development — from ideation to market-ready software.",
+      "Nigeria-based full-cycle software development company. Custom web & mobile apps, AI solutions, cloud infrastructure, and professional training.",
     type: "website",
     siteName: "BlackBox Tech",
-    locale: "en_US",
+    locale: "en_NG",
     url: SITE_URL,
     images: [{ url: `${SITE_URL}/logos/logoBlackPlain.png`, width: 512, height: 512, alt: "BlackBox Tech" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BlackBox Tech — Discover. Design. Deliver.",
-    description: "Full-cycle product development — from ideation to market-ready software.",
+    title: "BlackBox Tech — Software Development, Training & AI Solutions | Nigeria",
+    description: "Nigeria-based full-cycle software development company. Custom web & mobile apps, AI solutions, and professional training.",
     images: [`${SITE_URL}/logos/logoBlackPlain.png`],
   },
   alternates: {
@@ -125,9 +132,43 @@ export default async function RootLayout({
           name: "BlackBox Tech",
           url: SITE_URL,
           logo: `${SITE_URL}/logos/logoBlackPlain.png`,
-          description: "Full-cycle product development — from ideation to market-ready software.",
-          contactPoint: { "@type": "ContactPoint", telephone: "+234-805-020-5349", contactType: "customer service", email: "info@blackboxtech.online" },
-          sameAs: ["https://linkedin.com/company/blackboxtech", "https://instagram.com/blackboxtech", "https://twitter.com/blackboxtech", "https://facebook.com/blackboxtech"],
+          description: "Full-cycle software development company in Nigeria offering custom web & mobile app development, AI solutions, cybersecurity, cloud computing, UI/UX design, and professional software training.",
+          foundingDate: "2020",
+          slogan: "Discover. Design. Deliver.",
+          contactPoint: {
+            "@type": "ContactPoint",
+            telephone: "+234-805-020-5349",
+            contactType: "customer service",
+            email: "info@blackboxtech.online",
+            availableLanguage: ["English"],
+          },
+          address: {
+            "@type": "PostalAddress",
+            addressCountry: "NG",
+          },
+          sameAs: [
+            "https://linkedin.com/company/blackboxtech",
+            "https://instagram.com/blackboxtech",
+            "https://twitter.com/blackboxtech",
+            "https://facebook.com/blackboxtech",
+          ],
+          knowsAbout: [
+            "Software Development",
+            "Web Development",
+            "Mobile App Development",
+            "Artificial Intelligence",
+            "Machine Learning",
+            "Cloud Computing",
+            "Cybersecurity",
+            "UI/UX Design",
+            "DevOps",
+            "Software Training",
+            "Product Design",
+            "Full-Stack Development",
+            "SaaS Development",
+            "Enterprise Software",
+            "Startup Technology",
+          ],
         }} />}
         {!isAdmin && <CursorDots />}
         {!isAdmin && <Header />}
