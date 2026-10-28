@@ -58,4 +58,5 @@ export const GRADIENTS = {
   professional: "linear-gradient(135deg, #ddd7fd 0%, #fb4545dc 100%)",
   build: "linear-gradient(135deg, #1b1b1b 0%, #374151 100%)",
   contact: "linear-gradient(135deg, #fb4545dc 0%, #ddd7fd 100%)",
+  quote: "linear-gradient(135deg, #06b6d4 0%, #ddd7fd 100%)",
 };

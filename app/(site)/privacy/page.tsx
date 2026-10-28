@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { JsonLd } from "@/app/components/JsonLd";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blackboxtech.online";
 
@@ -7,11 +8,36 @@ export const metadata: Metadata = {
   title: "Privacy Policy — BlackBox Tech",
   description: "BlackBox Tech privacy policy detailing how we collect, use, and protect your information across our website and services.",
   alternates: { canonical: `${SITE_URL}/privacy` },
+  openGraph: {
+    title: "Privacy Policy | BlackBox Tech",
+    description: "How BlackBox Tech collects, uses, and protects your information across our website and services.",
+    type: "website",
+    url: `${SITE_URL}/privacy`,
+    siteName: "BlackBox Tech",
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: "BlackBox Tech — Privacy Policy" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | BlackBox Tech",
+    description: "How BlackBox Tech collects, uses, and protects your information across our website and services.",
+    images: [`${SITE_URL}/og-image.png`],
+  },
 };
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: "Privacy Policy", item: `${SITE_URL}/privacy` },
+          ],
+        }}
+      />
+      <div className="min-h-screen bg-dark text-white">
       <section className="pt-32 pb-12 px-4 text-center -mt-20">
         <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(251,69,69,0.12) 0%, transparent 60%)" }} />
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -108,5 +134,6 @@ export default function PrivacyPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

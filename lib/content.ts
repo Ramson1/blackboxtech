@@ -43,7 +43,7 @@ export const trustClients = [
 export const metrics = [
   { value: 50, prefix: "R ", suffix: "M+", label: "Revenue generated for clients" },
   { value: 150, prefix: "", suffix: "K+", label: "Users across deployed products" },
-  { value: 5, prefix: "", suffix: "+", label: "Years of excellence" },
+  { value: 10000, prefix: "", suffix: "+", label: "Hours of excellence" },
 ] as const;
 
 // ─── Services ─────────────────────────────────────────────────────────────────

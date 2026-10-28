@@ -9,6 +9,20 @@ export const metadata: Metadata = {
   description: "Comprehensive glossary of essential technology terms — software development, AI, cloud computing, cybersecurity, and more. Written by BlackBox Tech experts.",
   keywords: ["tech glossary", "software development terms", "AI definitions", "technology dictionary", "web development glossary"],
   alternates: { canonical: `${SITE_URL}/glossary` },
+  openGraph: {
+    title: "Tech Glossary — Key Terms & Definitions | BlackBox Tech",
+    description: "Comprehensive glossary of essential technology terms — software development, AI, cloud computing, cybersecurity, and more.",
+    type: "website",
+    url: `${SITE_URL}/glossary`,
+    siteName: "BlackBox Tech",
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: "BlackBox Tech — Tech Glossary" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tech Glossary — Key Terms & Definitions | BlackBox Tech",
+    description: "Comprehensive glossary of essential technology terms — software development, AI, cloud, cybersecurity, and more.",
+    images: [`${SITE_URL}/og-image.png`],
+  },
 };
 
 interface GlossaryEntry {
@@ -61,6 +75,16 @@ export default function GlossaryPage() {
   return (
     <>
       <JsonLd data={faqSchema} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: "Tech Glossary", item: `${SITE_URL}/glossary` },
+          ],
+        }}
+      />
       <div className="min-h-screen bg-white pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb */}

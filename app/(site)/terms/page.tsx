@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { JsonLd } from "@/app/components/JsonLd";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blackboxtech.online";
 
@@ -7,11 +8,36 @@ export const metadata: Metadata = {
   title: "Terms of Service — BlackBox Tech",
   description: "BlackBox Tech terms of service governing the use of our software development services, training programs, and products.",
   alternates: { canonical: `${SITE_URL}/terms` },
+  openGraph: {
+    title: "Terms of Service | BlackBox Tech",
+    description: "Terms governing the use of BlackBox Tech's software development services, training programs, and products.",
+    type: "website",
+    url: `${SITE_URL}/terms`,
+    siteName: "BlackBox Tech",
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: "BlackBox Tech — Terms of Service" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service | BlackBox Tech",
+    description: "Terms governing the use of BlackBox Tech's software development services, training programs, and products.",
+    images: [`${SITE_URL}/og-image.png`],
+  },
 };
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: "Terms of Service", item: `${SITE_URL}/terms` },
+          ],
+        }}
+      />
+      <div className="min-h-screen bg-dark text-white">
       <section className="pt-32 pb-12 px-4 text-center -mt-20">
         <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(251,69,69,0.12) 0%, transparent 60%)" }} />
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -76,5 +102,6 @@ export default function TermsPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

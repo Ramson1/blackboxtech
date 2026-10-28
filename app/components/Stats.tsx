@@ -21,7 +21,7 @@ function StatCounter({
       {/* Number */}
       <div className="text-5xl md:text-6xl font-black text-white leading-none">
         {prefix}
-        {count}
+        {count.toLocaleString()}
         {suffix}
       </div>
       {/* Label */}
