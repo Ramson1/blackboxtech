@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://blackboxtech.online";
 
+export const revalidate = 86400; // Cache sitemap for 24 hours
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

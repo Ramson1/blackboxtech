@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { insertLead } from "@/lib/supabase";
 import { sendEmail } from "@/lib/resend";
 import { emailHeader, emailFooter, wrapEmail, GRADIENTS } from "@/lib/email-templates";
+import { dispatchLead, attributionFromCookie, type Attribution } from "@/lib/automation/n8n-webhook";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "blackboxinfo01@gmail.com";
 
@@ -14,9 +15,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Registration type is required" }, { status: 400 });
     }
 
-    // Insert into Supabase based on type
+    // Client-sent attribution wins; first-touch cookie is the fallback.
+    const attribution: Attribution =
+      body.attribution && Object.keys(body.attribution).length > 0
+        ? body.attribution
+        : attributionFromCookie(request);
+
+    // Insert into Supabase based on type (service-role when configured — never .select() on anon)
     if (type === "student") {
-      const { error } = await supabase.from("blackbox_student_registrations").insert({
+      const rowId = await insertLead("blackbox_student_registrations", {
         parent_name: body.parentName,
         parent_email: body.parentEmail,
         parent_phone: body.parentPhone,
@@ -31,8 +38,21 @@ export async function POST(request: NextRequest) {
         payment_plan: body.paymentPlan,
         training_mode: body.trainingMode,
         notes: body.notes,
+        attribution,
       });
-      if (error) throw error;
+
+      void dispatchLead({
+        leadType: "student_registration",
+        interest: `Student training: ${(Array.isArray(body.programs) ? body.programs : []).join(", ") || "General"}`,
+        name: body.parentName,
+        email: body.parentEmail,
+        phone: body.parentPhone,
+        details: { childName: body.childName, schedule: body.schedule, trainingMode: body.trainingMode },
+        attribution,
+        sourceTable: "blackbox_student_registrations",
+        rowId,
+        timestamp: new Date().toISOString(),
+      });
 
       // Send emails
       await Promise.all([
@@ -48,7 +68,7 @@ export async function POST(request: NextRequest) {
         }),
       ]);
     } else if (type === "professional") {
-      const { error } = await supabase.from("blackbox_professional_registrations").insert({
+      const rowId = await insertLead("blackbox_professional_registrations", {
         full_name: body.fullName,
         email: body.email,
         phone: body.phone,
@@ -63,8 +83,21 @@ export async function POST(request: NextRequest) {
         training_mode: body.trainingMode,
         payment_preference: body.paymentPreference,
         additional_info: body.additionalInfo,
+        attribution,
       });
-      if (error) throw error;
+
+      void dispatchLead({
+        leadType: "professional_registration",
+        interest: `Professional training: ${(Array.isArray(body.programs) ? body.programs : []).join(", ") || "General"}`,
+        name: body.fullName,
+        email: body.email,
+        phone: body.phone,
+        details: { organization: body.organization, schedule: body.schedule, experienceLevel: body.experienceLevel },
+        attribution,
+        sourceTable: "blackbox_professional_registrations",
+        rowId,
+        timestamp: new Date().toISOString(),
+      });
 
       await Promise.all([
         sendEmail({
@@ -79,7 +112,7 @@ export async function POST(request: NextRequest) {
         }),
       ]);
     } else if (type === "build") {
-      const { error } = await supabase.from("blackbox_build_requests").insert({
+      const rowId = await insertLead("blackbox_build_requests", {
         company_name: body.companyName,
         full_name: body.fullName,
         email: body.email,
@@ -91,8 +124,21 @@ export async function POST(request: NextRequest) {
         files: body.files,
         file_urls: Array.isArray(body.file_urls) ? body.file_urls : [],
         additional_requirements: body.additionalRequirements,
+        attribution,
       });
-      if (error) throw error;
+
+      void dispatchLead({
+        leadType: "build_request",
+        interest: `Build request: ${body.projectType || "Custom software"}`,
+        name: body.fullName,
+        email: body.email,
+        phone: body.phone,
+        details: { company: body.companyName, budget: body.budget, timeline: body.timeline, description: body.description },
+        attribution,
+        sourceTable: "blackbox_build_requests",
+        rowId,
+        timestamp: new Date().toISOString(),
+      });
 
       await Promise.all([
         sendEmail({

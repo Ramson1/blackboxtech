@@ -1,25 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { insertLead } from "@/lib/supabase";
 import { sendEmail } from "@/lib/resend";
 import { emailHeader, emailFooter, wrapEmail, GRADIENTS } from "@/lib/email-templates";
+import { dispatchLead, attributionFromCookie } from "@/lib/automation/n8n-webhook";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "blackboxinfo01@gmail.com";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, message } = await request.json();
+    const { name, email, message, attribution: bodyAttribution } = await request.json();
 
     if (!name || !email || !message) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    // Insert into Supabase
-    const { error } = await supabase.from("blackbox_contact_messages").insert({
+    const attribution =
+      bodyAttribution && Object.keys(bodyAttribution).length > 0
+        ? bodyAttribution
+        : attributionFromCookie(request);
+
+    // Insert into Supabase (service-role when configured — never .select() on anon)
+    const rowId = await insertLead("blackbox_contact_messages", {
       name,
       email,
       message,
+      attribution,
     });
-    if (error) throw error;
+
+    // Non-blocking n8n lead dispatch (never fails the capture flow)
+    void dispatchLead({
+      leadType: "contact_message",
+      interest: "General inquiry via chat/contact form",
+      name,
+      email,
+      details: { message },
+      attribution,
+      sourceTable: "blackbox_contact_messages",
+      rowId,
+      timestamp: new Date().toISOString(),
+    });
 
     // Send admin notification + client confirmation
     await Promise.all([
@@ -71,7 +90,7 @@ function buildContactConfirmation(name: string) {
       <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem;">
         <p style="font-size: 0.9rem; color: #374151; font-weight: 700; margin: 0 0 0.75rem;">In the meantime:</p>
         <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Explore our <a href="https://blackboxtech-nine.vercel.app" style="color: #fb4545dc; text-decoration: none;">website</a> to learn about our services</td></tr>
+          <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Explore our <a href="https://blackboxtech.online" style="color: #fb4545dc; text-decoration: none;">website</a> to learn about our services</td></tr>
           <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Check out our training programs for students &amp; professionals</td></tr>
           <tr><td style="padding: 0.3rem 0; font-size: 0.9rem; color: #374151;">&#10003; Browse our product catalog</td></tr>
         </table>

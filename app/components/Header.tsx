@@ -126,11 +126,11 @@ export function Header() {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0 }}>
             <Image
-              src="/logos/logoBlackPlain.png"
+              src="/logos/logoBlackPlain.webp"
               alt="BlackBox Tech"
-              width={32}
-              height={32}
-              style={{ objectFit: "contain", width: "auto", height: "auto" }}
+              width={40}
+              height={40}
+              className="h-10 w-auto object-contain"
               priority
             />
           </Link>

@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { buildWhatsAppUrlWithParams, WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { captureAttribution, getStoredAttribution } from "@/lib/attribution";
+import { WhatsAppIcon } from "./icons/WhatsAppIcon";
 
 type Message = {
   id: number;
@@ -18,6 +22,21 @@ export function ChatWidget() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Sticky WhatsApp action: pre-filled with current page + campaign so we
+  // can trace which video/ad brought the lead in.
+  const [waHref, setWaHref] = useState(`https://wa.me/${WHATSAPP_NUMBER}`);
+  useEffect(() => {
+    const attr = captureAttribution();
+    setWaHref(
+      buildWhatsAppUrlWithParams(
+        "Hi! I'm on the BlackBox Tech website and I'd like to ask about",
+        pathname,
+        attr.utm_campaign,
+      ),
+    );
+  }, [pathname]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,7 +66,7 @@ export function ChatWidget() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message, attribution: getStoredAttribution() }),
       });
 
       if (!res.ok) throw new Error("Failed to send");
@@ -70,6 +89,18 @@ export function ChatWidget() {
 
   return (
     <>
+      {/* Sticky mobile WhatsApp action (hidden on desktop — chat covers it) */}
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with us on WhatsApp"
+        className="md:hidden fixed z-[9998] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg active:scale-95 transition-transform"
+        style={{ bottom: "1.25rem", left: "1.25rem" }}
+      >
+        <WhatsAppIcon className="h-7 w-7" />
+      </a>
+
       {/* Floating chat button */}
       <button
         onClick={() => setIsOpen(!isOpen)}

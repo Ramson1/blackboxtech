@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, getSupabaseAdmin } from "@/lib/supabase";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
@@ -8,7 +8,14 @@ const TABLE_MAP: Record<string, string> = {
   professional: "blackbox_professional_registrations",
   build: "blackbox_build_requests",
   contact: "blackbox_contact_messages",
+  quote: "blackbox_quote_requests",
 };
+
+// Prefer the service-role client: blackbox_quote_requests SELECT is restricted
+// to authenticated/service_role by the hardened RLS policies.
+function db() {
+  return getSupabaseAdmin() ?? supabase;
+}
 
 function verifyAdmin(request: NextRequest): boolean {
   const password = request.headers.get("x-admin-password");
@@ -26,7 +33,7 @@ export async function GET(request: NextRequest) {
     const results: Record<string, unknown[]> = {};
 
     if (type === "all" || type === "student") {
-      const { data } = await supabase
+      const { data } = await db()
         .from("blackbox_student_registrations")
         .select("*")
         .order("created_at", { ascending: false });
@@ -34,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === "all" || type === "professional") {
-      const { data } = await supabase
+      const { data } = await db()
         .from("blackbox_professional_registrations")
         .select("*")
         .order("created_at", { ascending: false });
@@ -42,7 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === "all" || type === "build") {
-      const { data } = await supabase
+      const { data } = await db()
         .from("blackbox_build_requests")
         .select("*")
         .order("created_at", { ascending: false });
@@ -50,11 +57,19 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === "all" || type === "contact") {
-      const { data } = await supabase
+      const { data } = await db()
         .from("blackbox_contact_messages")
         .select("*")
         .order("created_at", { ascending: false });
       results.contact = data || [];
+    }
+
+    if (type === "all" || type === "quote") {
+      const { data } = await db()
+        .from("blackbox_quote_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+      results.quote = data || [];
     }
 
     return NextResponse.json(results);
@@ -80,7 +95,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
-    const { error } = await supabase.from(table).delete().eq("id", id);
+    const { error } = await db().from(table).delete().eq("id", id);
     if (error) throw error;
 
     return NextResponse.json({ success: true });

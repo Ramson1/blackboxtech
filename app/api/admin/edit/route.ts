@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, getSupabaseAdmin } from "@/lib/supabase";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
@@ -8,6 +8,7 @@ const TABLE_MAP: Record<string, string> = {
   professional: "blackbox_professional_registrations",
   build: "blackbox_build_requests",
   contact: "blackbox_contact_messages",
+  quote: "blackbox_quote_requests",
 };
 
 export async function PATCH(request: NextRequest) {
@@ -28,7 +29,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
-    const { error } = await supabase.from(table).update(fields).eq("id", id);
+    // Service-role first: quote rows are not UPDATE-able under anon RLS.
+    // jsonb/boolean columns are never sent by the edit modal (skipped client-side).
+    const db = getSupabaseAdmin() ?? supabase;
+    const { error } = await db.from(table).update(fields).eq("id", id);
     if (error) throw error;
 
     return NextResponse.json({ success: true });

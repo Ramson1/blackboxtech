@@ -1,0 +1,96 @@
+# BlackBox Tech
+
+> Discover. Design. Deliver. Full-cycle custom software engineering and premier tech education academy based in Nigeria, serving global startups, enterprises, and students.
+
+Website: https://blackboxtech.online
+Contact Email: info@blackboxtech.online
+Phone & WhatsApp: +234 805 020 5349
+Direct WhatsApp Chat: https://wa.me/2348050205349?text=Hi%20BlackBox%20Tech,%20I%20want%20to%20learn%20more%20about%20your%20services
+
+---
+
+## Core Pillar A: Custom Software & Product Development
+
+URL: https://blackboxtech.online/build
+Direct Request: https://blackboxtech.online/build
+
+### Service Capabilities
+- **Web Application Development**: Next.js, React, Node.js, TypeScript, PostgreSQL, Supabase, Tailwind CSS.
+- **Mobile Application Development**: Cross-platform iOS & Android apps built with React Native.
+- **AI & Intelligent Automation**: Natural Language Processing (NLP), Computer Vision, Predictive Analytics, custom LLM integration.
+- **Cloud Infrastructure & DevOps**: Automated CI/CD pipelines, Docker, Kubernetes, AWS, Azure, Google Cloud Platform (GCP).
+- **Cybersecurity & Compliance**: Penetration testing, vulnerability assessments, security audits, and zero-trust implementation.
+- **UI/UX Product Design**: User research, wireframing, high-fidelity Figma prototypes, and design systems.
+
+### Process & Turnaround
+1. **Discovery & Validation**: Requirements analysis, technical feasibility, and architectural planning.
+2. **Design & Prototyping**: Interactive Figma prototypes with user testing.
+3. **Engineering**: 2-week agile sprints with continuous staging previews.
+4. **Deployment & Growth**: Production launch, performance monitoring, security hardening, and ongoing maintenance.
+- **MVP Turnaround**: 4–8 weeks from kickoff.
+- **Proposal Response**: Detailed proposal and quote within 48 hours.
+
+### Budget & Pricing Guidelines
+- **Small Project / MVP Validation**: Under R10,000 / $500
+- **Standard Web / Mobile Application**: R10,000 – R50,000 / $500 – $2,500
+- **Complex Platform / E-Commerce / SaaS**: R50,000 – R150,000 / $2,500 – $7,500
+- **Enterprise-Grade System / AI Architecture**: R150,000 – R500,000+ / $7,500+
+
+---
+
+## Core Pillar B: Student & Professional Tech Training Academy
+
+URLs:
+- Student Enrollment (Kids & Young Learners): https://blackboxtech.online/register/student
+- Professional Upskilling (Career Advancement): https://blackboxtech.online/register/professional
+
+### 1. Student Training Programs (Ages 7–18+)
+Curriculum designed for primary, secondary, and pre-university students:
+- **Scratch Programming**: Visual, block-based coding fundamentals for beginners.
+- **Roblox Game Development**: 3D game creation, scripting, and digital asset design.
+- **Python Programming**: Python basics, algorithms, and beginner problem-solving.
+- **Front-End Web Development**: HTML, CSS, JavaScript, and building interactive websites.
+- **Game Development**: 2D & 3D game mechanics with Unity.
+- **UI/UX & Graphic Design**: Digital art, branding, and interface design basics.
+
+### 2. Professional Training Programs
+Industry-accredited programs for working professionals, graduates, and career changers:
+- **Full Stack Web Development**: Modern Next.js, React, Node.js, APIs, Supabase & deployment.
+- **Mobile App Development**: React Native, iOS & Android deployment, app store publishing.
+- **Artificial Intelligence & Machine Learning**: ML algorithms, NLP, neural networks, practical AI models.
+- **DevOps & Cloud Computing**: Docker, Kubernetes, CI/CD, AWS/Azure fundamentals.
+- **Cybersecurity & Ethical Hacking**: Network security, vulnerability scanning, threat defense.
+- **Data Analytics & Business Intelligence**: SQL, Python, Excel, Power BI dashboards.
+- **UI/UX Design**: End-to-end Figma workflows, design thinking, user testing.
+- **Digital Marketing**: Search Engine Optimization (SEO), PPC, social media growth funnels.
+
+### Flexible Schedules & Payment Modes
+- **Schedules**: Weekday Evenings (Monday–Friday 6:00 PM – 9:00 PM) or Weekends (Saturday–Sunday 9:00 AM – 4:00 PM).
+- **Delivery**: Onsite (Lagos, Nigeria) and Live Instructor-Led Online (Global).
+- **Payment Options**: Hourly Pay-as-you-go, Flexible Weekly Installments, or Discounted Monthly Subscription.
+
+---
+
+## In-House Digital Products Portfolio
+
+URL: https://blackboxtech.online/products
+- **Beautcia**: Multi-vendor beauty booking marketplace and salon management system.
+- **LNEX**: Modern EdTech student portal, computer-based testing (CBT), and exam analytics.
+- **Rhema Expert Solutions**: STEM education platform and academic resource hub.
+- **LifeLink MPCS**: Financial management software for cooperatives and credit unions.
+- **MetaShares**: Fractional investment and asset-sharing digital platform.
+- **TokenVault**: Web3 token allocation and decentralized asset management tool.
+- **PayTracker**: Personal and small business expense and income tracking application.
+- **QR Code Generator & Resume Builder**: High-utility productivity web tools.
+
+---
+
+## Canonical Links & Resources
+- Homepage: https://blackboxtech.online
+- Custom Software Development: https://blackboxtech.online/build
+- Student Training: https://blackboxtech.online/register/student
+- Professional Training: https://blackboxtech.online/register/professional
+- In-House Products: https://blackboxtech.online/products
+- Tech Blog & Insights: https://blackboxtech.online/blog
+- Technology Glossary: https://blackboxtech.online/glossary
+- Direct WhatsApp Contact: https://wa.me/2348050205349

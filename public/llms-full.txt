@@ -1,0 +1,121 @@
+# BlackBox Tech — Complete Capability & Curriculum Manifest (llms-full.txt)
+
+> BlackBox Tech is a full-cycle software development company and advanced tech training academy founded in Nigeria. We engineer market-ready software solutions for startups, enterprises, and institutions while training the next generation of engineers and designers.
+
+Official Domain: https://blackboxtech.online
+Primary Location: Lagos, Nigeria
+Global Delivery: Remote & Onsite
+General Inquiries: info@blackboxtech.online
+Direct WhatsApp Support: https://wa.me/2348050205349?text=Hi%20BlackBox%20Tech,%20I%20have%20an%20inquiry%20regarding%20your%20services
+Phone: +234 805 020 5349
+
+---
+
+## 1. Core Pillar A: Custom Software & Product Development (/build)
+
+Landing Page: https://blackboxtech.online/build
+
+### 1.1 Overview
+BlackBox Tech handles the entire lifecycle of software creation:
+1. **Discovery & Ideation**: Market research, competitive analysis, requirement scoping, technical feasibility.
+2. **Design & UX Architecture**: Wireframes, design systems, clickable high-fidelity Figma prototypes, user testing.
+3. **Engineering**: Web apps, mobile apps, backend APIs, microservices, AI integrations, data pipelines.
+4. **Cloud Infrastructure & Security**: Automated CI/CD, container orchestration, cloud hosting, vulnerability assessments.
+5. **Post-Launch Support**: Maintenance, SLA monitoring, feature iteration, scale-up engineering.
+
+### 1.2 Technology Stacks
+- **Frontend**: Next.js 16/15, React 19, TypeScript, Tailwind CSS v4, HTML5, WebSockets, Progressive Web Apps (PWAs).
+- **Backend & APIs**: Node.js, Express, NestJS, Python (FastAPI/Django), RESTful APIs, GraphQL.
+- **Databases & Storage**: PostgreSQL, Supabase, Redis, MySQL, Supabase Storage, AWS S3.
+- **Mobile Development**: React Native (cross-platform iOS & Android), Expo, native bridges.
+- **AI & Machine Learning**: Python, PyTorch, TensorFlow, Hugging Face, OpenAI APIs, Anthropic APIs, local LLMs, LangChain, vector databases (pgvector).
+- **Cloud & DevOps**: Docker, Kubernetes, AWS (EC2, ECS, S3, RDS, Lambda), Google Cloud Platform (GCP), Microsoft Azure, Vercel, Cloudflare, GitHub Actions CI/CD.
+- **Security**: OWASP compliance, JWT authentication, end-to-end encryption, penetration testing, automated vulnerability scanning.
+
+### 1.3 Project Timelines & Delivery SLA
+- **Proof of Concept (PoC) / Fast Prototype**: 2–3 weeks
+- **Startup MVP (Minimum Viable Product)**: 4–8 weeks
+- **Custom Enterprise System / SaaS Application**: 12–24 weeks
+- **Proposal Response SLA**: Detailed architectural overview and transparent quotation delivered within 48 hours.
+
+### 1.4 Pricing & Investment Tiers
+- **Tier 1 (Validation / Minor Tool)**: Under R10,000 / $500
+- **Tier 2 (Standard Web / Mobile MVP)**: R10,000 – R50,000 / $500 – $2,500
+- **Tier 3 (Medium Product / E-Commerce / Custom SaaS)**: R50,000 – R150,000 / $2,500 – $7,500
+- **Tier 4 (High-Complexity / Enterprise / AI Integration)**: R150,000 – R500,000+ / $7,500+
+- **Contract Models**: Fixed-price milestone delivery or dedicated team monthly retainer.
+
+---
+
+## 2. Core Pillar B: Student & Professional Tech Training Academy
+
+### 2.1 Student Training Programs (Ages 7–18+)
+URL: https://blackboxtech.online/register/student
+
+Curriculum tailored for young learners, secondary school students, and university prep:
+1. **Scratch Programming**: Logical thinking, loops, events, game mechanics, and animations.
+2. **Roblox Game Development**: 3D world building, Lua scripting, game economics, and level design.
+3. **Python for Young Coders**: Syntax, variables, conditionals, data structures, and mini-games.
+4. **Web Development Basics**: HTML, CSS, JavaScript, and building personal portfolio websites.
+5. **Game Development with Unity**: 2D/3D physics, collision detection, sprite animation, and game logic.
+6. **UI/UX & Digital Art**: Canva, Figma, typography, color theory, and digital asset creation.
+7. **Cyber Safety & Digital Ethics**: Online privacy, password management, and safe internet practices.
+
+### 2.2 Professional Training Programs (Adults, Graduates & Career Changers)
+URL: https://blackboxtech.online/register/professional
+
+Intensive, project-based courses designed to build job-ready portfolios:
+1. **Front-End Web Development**: Modern JavaScript (ES6+), React, Next.js, Tailwind CSS, API consumption, responsive design.
+2. **Back-End Web Development**: Node.js, Express, REST APIs, PostgreSQL, Supabase, database modeling, authentication.
+3. **Full-Stack Web Development**: Complete front-to-back application development, CI/CD, state management, deployment.
+4. **Mobile App Development**: React Native, Expo, mobile UI patterns, push notifications, App Store & Google Play publishing.
+5. **UI/UX Design**: User research, personas, wireframing, component-driven design systems in Figma, usability testing.
+6. **Artificial Intelligence & Machine Learning**: Supervised/unsupervised learning, natural language processing, prompt engineering, generative AI integration.
+7. **Cybersecurity & Threat Defense**: Network protocols, vulnerability scanning, ethical hacking methodologies, penetration testing, compliance.
+8. **Cloud Computing & DevOps**: Cloud architecture (AWS/Azure), Docker containerization, Kubernetes orchestration, CI/CD pipeline automation.
+9. **Data Analytics & BI**: Excel advanced functions, SQL queries, Python data analysis (Pandas/NumPy), Power BI visualization dashboards.
+10. **Blockchain Fundamentals**: Smart contract basics, Web3 architecture, decentralized applications (dApps).
+11. **Digital Marketing & Growth Funnels**: Technical SEO, social media advertising, conversion rate optimization (CRO), analytics.
+
+### 2.3 Learning Formats & Schedules
+- **Class Schedules**:
+  - Weekday Evenings: Monday to Friday, 6:00 PM – 9:00 PM GMT+1.
+  - Weekend Cohorts: Saturday & Sunday, 9:00 AM – 4:00 PM GMT+1.
+- **Delivery Modes**:
+  - In-Person / Physical Lab: Lagos, Nigeria.
+  - Live Online / Interactive Virtual: Global enrollment with recorded sessions and 1-on-1 mentor code reviews.
+- **Payment Flexibility**:
+  - Per-Hour: Pay per session attended.
+  - Weekly Plan: Flexible recurring weekly billing.
+  - Monthly Plan: Best-value discounted subscription with project portfolio reviews.
+
+---
+
+## 3. In-House Software Products
+
+Showcase: https://blackboxtech.online/products
+
+1. **Beautcia**: Multi-vendor beauty booking marketplace connecting stylists, salons, and clients with calendar management and instant payouts.
+2. **LNEX**: High-volume EdTech exam portal and computer-based testing (CBT) suite with real-time scoring and student analytics.
+3. **Rhema Expert Solutions**: STEM education platform delivering curriculum modules and digital academic resources.
+4. **LifeLink MPCS**: Cooperative society and micro-savings management system handling member ledgers, loan repayments, and dividends.
+5. **MetaShares**: Digital investment and equity fractionalization application for emerging ventures.
+6. **TokenVault**: Web3 token vesting, airdrop distributor, and crypto asset tracking utility.
+7. **PayTracker**: Real-time personal and SME expense tracking, invoicing, and profit-and-loss reporting.
+8. **QR Code Generator & Resume Builder**: High-performance browser-based utility tools with export options.
+
+---
+
+## 4. Frequently Asked Questions (AI Reference)
+
+- **Q: How can I hire BlackBox Tech to build software?**
+  A: Fill out the project request form at https://blackboxtech.online/build or message directly via WhatsApp at +2348050205349. We review requirements and send a scope and quotation within 48 hours.
+
+- **Q: Can parents enroll children in coding classes?**
+  A: Yes, parents can register their children at https://blackboxtech.online/register/student. Courses are tailored for ages 7 and up, with weekend and evening slots available.
+
+- **Q: Does BlackBox Tech offer corporate software training?**
+  A: Yes, we provide custom corporate training programs in DevOps, Cloud, AI, and Full-Stack development for enterprise engineering teams.
+
+- **Q: What is BlackBox Tech's official website?**
+  A: https://blackboxtech.online

@@ -1,13 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { services, trainingCourses } from "@/lib/content";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "./icons/WhatsAppIcon";
 
 const bgColors = ["bg-purple-50", "bg-crimson-50", "bg-purple-50", "bg-crimson-50"];
 
-export function Services() {
-  const [showAlert, setShowAlert] = useState(false);
+/** Courses aimed at school-age learners route to student registration; the rest to professional. */
+const STUDENT_COURSES = new Set(["Scratch Programming"]);
 
+/** Small round WhatsApp quick-inquiry button (href built post-mount for attribution). */
+function WaButton({ message, label }: { message: string; label: string }) {
+  const [href, setHref] = useState("https://wa.me/");
+  useEffect(() => {
+    setHref(buildWhatsAppUrl(message));
+  }, [message]);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      title={label}
+      className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#25D366]/40 text-[#1da851] transition-colors hover:bg-[#25D366] hover:text-white"
+    >
+      <WhatsAppIcon className="h-4.5 w-4.5" />
+    </a>
+  );
+}
+
+export function Services() {
   return (
     <section id="services" className="py-20 md:py-28 bg-white relative overflow-hidden">
       {/* Animated gradient background */}
@@ -26,8 +50,7 @@ export function Services() {
           {services.map((service, i) => (
             <div
               key={service.title}
-              onClick={() => setShowAlert(true)}
-              className={`p-6 rounded-2xl ${bgColors[i]} hover:-translate-y-0.5 hover:shadow-lg transition-all cursor-pointer`}
+              className={`flex flex-col p-6 rounded-2xl ${bgColors[i]} hover:-translate-y-0.5 hover:shadow-lg transition-all`}
             >
               <h3 className="text-xl font-bold text-dark mb-3">
                 {service.title}
@@ -35,7 +58,7 @@ export function Services() {
               <p className="text-gray text-sm leading-relaxed mb-5">
                 {service.description}
               </p>
-              <ul className="space-y-1.5">
+              <ul className="space-y-1.5 mb-6">
                 {service.keywords.map((kw) => (
                   <li
                     key={kw}
@@ -46,6 +69,19 @@ export function Services() {
                   </li>
                 ))}
               </ul>
+              {/* Direct actions — no modal detour */}
+              <div className="mt-auto flex items-center gap-2.5">
+                <Link
+                  href={`/build?service=${encodeURIComponent(service.title)}`}
+                  className="flex-1 text-center rounded-full bg-[#fb4545dc] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-crimson-200"
+                >
+                  Start a {service.title} Project
+                </Link>
+                <WaButton
+                  message={`Hi, I'm interested in your ${service.title} service. Can you share more details?`}
+                  label={`Chat on WhatsApp about ${service.title}`}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -67,78 +103,41 @@ export function Services() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {trainingCourses.map((course) => (
-            <div
-              key={course.name}
-              onClick={() => setShowAlert(true)}
-              className="group relative p-5 rounded-2xl border border-gray-100 bg-white hover:border-crimson-100 hover:shadow-md transition-all cursor-pointer"
-            >
-              <span className="text-3xl mb-3 block">{course.icon}</span>
-              <h3 className="text-base font-bold text-dark mb-1.5 group-hover:text-crimson-200 transition-colors">
-                {course.name}
-              </h3>
-              <p className="text-sm text-gray leading-relaxed">
-                {course.description}
-              </p>
-            </div>
-          ))}
+          {trainingCourses.map((course) => {
+            const registerHref = STUDENT_COURSES.has(course.name)
+              ? "/register/student"
+              : "/register/professional";
+            const enrollHref = `${registerHref}?program=${encodeURIComponent(course.name)}`;
+            return (
+              <div
+                key={course.name}
+                className="group relative flex flex-col p-5 rounded-2xl border border-gray-100 bg-white hover:border-crimson-100 hover:shadow-md transition-all"
+              >
+                <span className="text-3xl mb-3 block">{course.icon}</span>
+                <h3 className="text-base font-bold text-dark mb-1.5 group-hover:text-crimson-200 transition-colors">
+                  {course.name}
+                </h3>
+                <p className="text-sm text-gray leading-relaxed mb-5">
+                  {course.description}
+                </p>
+                {/* Direct actions — enroll or ask on WhatsApp */}
+                <div className="mt-auto flex items-center gap-2.5">
+                  <Link
+                    href={enrollHref}
+                    className="flex-1 text-center rounded-full bg-dark px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+                  >
+                    Enroll Now
+                  </Link>
+                  <WaButton
+                    message={`Hi, I'm interested in the ${course.name} course at BlackBox Tech Academy. Please send me the curriculum and pricing.`}
+                    label={`Chat on WhatsApp about ${course.name}`}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      {/* Custom Alert Modal */}
-      {showAlert && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAlert(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            {/* Icon */}
-            <div className="w-12 h-12 rounded-full bg-crimson-50 flex items-center justify-center mb-4 mx-auto">
-              <svg className="w-6 h-6 text-crimson-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-
-            <h3 className="text-xl font-bold text-dark text-center mb-3">
-              Ready to Get Started?
-            </h3>
-
-            <p className="text-gray text-sm text-center mb-5 leading-relaxed">
-              To register for a training or book a service, please use the options below:
-            </p>
-
-            {/* Desktop instruction */}
-            <div className="bg-purple-50 rounded-xl p-4 mb-3 border border-purple-100">
-              <div className="flex items-start gap-3">
-                <span className="text-lg flex-shrink-0">🖥️</span>
-                <div>
-                  <p className="text-sm font-semibold text-dark mb-1">On Desktop</p>
-                  <p className="text-xs text-gray leading-relaxed">
-                    Click the <span className="font-bold text-dark">&quot;Get Started&quot;</span> button in the navigation bar at the top, then select the option you want — e.g. <span className="font-bold text-dark">Student Training</span>, <span className="font-bold text-dark">Professional Training</span>, or <span className="font-bold text-dark">Build My Software</span>.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile instruction */}
-            <div className="bg-crimson-50/50 rounded-xl p-4 mb-5 border border-crimson-100/30">
-              <div className="flex items-start gap-3">
-                <span className="text-lg flex-shrink-0">📱</span>
-                <div>
-                  <p className="text-sm font-semibold text-dark mb-1">On Mobile</p>
-                  <p className="text-xs text-gray leading-relaxed">
-                    Tap the <span className="font-bold text-dark">menu button (☰)</span> at the top right, then select your preferred option from the menu list at the bottom — e.g. <span className="font-bold text-dark">Student Training</span>, <span className="font-bold text-dark">Professional Training</span>, or <span className="font-bold text-dark">Build My Software</span>.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowAlert(false)}
-              className="w-full bg-[#fb4545dc] hover:bg-[#fb4545dc]/80 text-white font-semibold py-3 rounded-xl transition-colors"
-            >
-              Got it
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

@@ -4,160 +4,100 @@ import { useEffect, useRef } from "react";
 
 const GRID_SPACING = 36;
 const REVEAL_RADIUS = 130;
-const DOT_SIZE = 6;
-const LERP_SPEED = 0.08;
+const DOT_RADIUS = 2.5;
 
 export function CursorDots() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dotData = useRef<{
-    el: HTMLDivElement;
-    baseX: number;
-    baseY: number;
-    currentOpacity: number;
-  }[]>([]);
-  const mousePos = useRef({ x: -9999, y: -9999 });
-  const rafId = useRef<number>(0);
-  const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    // Only run on desktop devices with a precision pointer (mouse)
+    if (typeof window === "undefined") return;
+    const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+    if (!isFinePointer) return;
 
-    const buildGrid = () => {
-      // Clear existing dots
-      for (const dot of dotData.current) {
-        dot.el.remove();
-      }
-      dotData.current = [];
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-      // Build the grid of dots — viewport only (container is fixed)
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const cols = Math.ceil(w / GRID_SPACING) + 1;
-      const rows = Math.ceil(h / GRID_SPACING) + 1;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
 
-      const offsetX = GRID_SPACING / 2;
-      const offsetY = GRID_SPACING / 2;
+    let mouseX = -9999;
+    let mouseY = -9999;
+    let rafId = 0;
+    let isMouseOver = false;
 
-      const dots: typeof dotData.current = [];
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const x = offsetX + col * GRID_SPACING;
-          const y = offsetY + row * GRID_SPACING;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      isMouseOver = true;
+    };
 
-          if (x > w || y > h) continue;
+    const handleMouseLeave = () => {
+      isMouseOver = false;
+      mouseX = -9999;
+      mouseY = -9999;
+    };
 
-          const el = document.createElement("div");
-          el.className = "absolute rounded-full";
-          el.style.width = `${DOT_SIZE}px`;
-          el.style.height = `${DOT_SIZE}px`;
-          el.style.left = `${x - DOT_SIZE / 2}px`;
-          el.style.top = `${y - DOT_SIZE / 2}px`;
-          el.style.opacity = "0";
-          el.style.backgroundColor = "rgba(30, 30, 30, 0.6)";
-          el.style.border = "1px solid rgba(255, 255, 255, 1)";
-          el.style.willChange = "opacity";
-          el.style.boxSizing = "border-box";
-          container.appendChild(el);
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
 
-          dots.push({ el, baseX: x, baseY: y, currentOpacity: 0 });
+      if (isMouseOver && mouseX > -100) {
+        const startX = Math.max(0, mouseX - REVEAL_RADIUS);
+        const endX = Math.min(width, mouseX + REVEAL_RADIUS);
+        const startY = Math.max(0, mouseY - REVEAL_RADIUS);
+        const endY = Math.min(height, mouseY + REVEAL_RADIUS);
+
+        const firstCol = Math.floor(startX / GRID_SPACING) * GRID_SPACING + GRID_SPACING / 2;
+        const firstRow = Math.floor(startY / GRID_SPACING) * GRID_SPACING + GRID_SPACING / 2;
+
+        for (let x = firstCol; x <= endX; x += GRID_SPACING) {
+          for (let y = firstRow; y <= endY; y += GRID_SPACING) {
+            const dx = x - mouseX;
+            const dy = y - mouseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < REVEAL_RADIUS) {
+              const t = 1 - dist / REVEAL_RADIUS;
+              const alpha = t * t * (3 - 2 * t) * 0.45;
+
+              ctx.beginPath();
+              ctx.arc(x, y, DOT_RADIUS, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(30, 30, 30, ${alpha})`;
+              ctx.fill();
+            }
+          }
         }
       }
 
-      dotData.current = dots;
+      rafId = requestAnimationFrame(render);
     };
 
-    buildGrid();
-
-    const onResize = () => {
-      buildGrid();
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const onTouch = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      if (touch) {
-        // Cancel any pending hide timer
-        if (touchTimer.current) {
-          clearTimeout(touchTimer.current);
-          touchTimer.current = null;
-        }
-        mousePos.current = { x: touch.clientX, y: touch.clientY };
-      }
-    };
-
-    const onTouchEnd = () => {
-      // Hide dots after 1 second of no touch
-      touchTimer.current = setTimeout(() => {
-        mousePos.current = { x: -9999, y: -9999 };
-        touchTimer.current = null;
-      }, 1000);
-    };
-
-    const animate = () => {
-      const mx = mousePos.current.x;
-      const my = mousePos.current.y;
-
-      for (const dot of dotData.current) {
-        const dx = dot.baseX - mx;
-        const dy = dot.baseY - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        let target = 0;
-        if (dist < REVEAL_RADIUS) {
-          const t = 1 - dist / REVEAL_RADIUS;
-          target = t * t * (3 - 2 * t);
-        }
-
-        dot.currentOpacity += (target - dot.currentOpacity) * LERP_SPEED;
-
-        if (Math.abs(dot.currentOpacity - target) > 0.005 || target > 0.01) {
-          dot.el.style.opacity = String(Math.max(0, dot.currentOpacity));
-        }
-      }
-
-      rafId.current = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("touchstart", onTouch, { passive: true });
-    window.addEventListener("touchmove", onTouch, { passive: true });
-    window.addEventListener("touchend", onTouchEnd);
-    window.addEventListener("resize", onResize);
-    rafId.current = requestAnimationFrame(animate);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseleave", handleMouseLeave);
+    rafId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("touchstart", onTouch);
-      window.removeEventListener("touchmove", onTouch);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(rafId.current);
-      if (touchTimer.current) clearTimeout(touchTimer.current);
-      for (const dot of dotData.current) {
-        dot.el.remove();
-      }
-      dotData.current = [];
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        zIndex: 30,
-        pointerEvents: "none",
-        overflow: "hidden",
-      }}
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-30"
+      style={{ width: "100vw", height: "100vh" }}
       aria-hidden="true"
     />
   );

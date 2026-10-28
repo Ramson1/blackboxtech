@@ -2,8 +2,8 @@
 // Shared branded email wrapper for all transactional emails.
 // Uses absolute URLs since emails cannot reference local files.
 
-const LOGO_URL = "https://blackboxtech-nine.vercel.app/logos/logoBlack.png";
-const SITE_URL = "https://blackboxtech-nine.vercel.app";
+const LOGO_URL = "https://blackboxtech.online/logos/logoBlackPlain.webp";
+const SITE_URL = "https://blackboxtech.online";
 
 export function emailHeader(title: string, gradient: string) {
   return `
