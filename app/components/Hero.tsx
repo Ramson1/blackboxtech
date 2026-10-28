@@ -172,8 +172,8 @@ export function Hero() {
           </a>
         </div>
 
-        {/* VSL / explainer video funnel card */}
-        <VideoFunnelCard />
+        {/* VSL / explainer video funnel card — only shown once a video src is configured */}
+        {heroVideo.src ? <VideoFunnelCard /> : null}
       </div>
     </section>
   );
