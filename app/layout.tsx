@@ -137,10 +137,11 @@ export default function RootLayout({
                   addressCountry: "NG",
                 },
                 sameAs: [
-                  "https://linkedin.com/company/blackboxtech",
-                  "https://instagram.com/blackboxtech",
-                  "https://twitter.com/blackboxtech",
-                  "https://facebook.com/blackboxtech",
+                  "https://www.tiktok.com/@blackboxtechhq",
+                  "https://www.instagram.com/blackboxtechhq",
+                  "https://www.facebook.com/blackboxtechhq",
+                  "https://www.youtube.com/@blackboxtech-hq",
+                  "https://www.linkedin.com/company/blackboxtechhq",
                 ],
                 knowsAbout: [
                   "Software Development",

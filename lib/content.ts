@@ -352,9 +352,10 @@ export const contactInfo = {
   email: "info@blackboxtech.online",
   phone: "+234 805 020 5349",
   socials: {
-    linkedin: "https://linkedin.com/company/blackboxtech",
-    instagram: "https://instagram.com/blackboxtech",
-    facebook: "https://facebook.com/blackboxtech",
-    twitter: "https://twitter.com/blackboxtech",
+    linkedin: "https://www.linkedin.com/company/blackboxtechhq",
+    instagram: "https://www.instagram.com/blackboxtechhq",
+    facebook: "https://www.facebook.com/blackboxtechhq",
+    tiktok: "https://www.tiktok.com/@blackboxtechhq",
+    youtube: "https://www.youtube.com/@blackboxtech-hq",
   },
 } as const;
